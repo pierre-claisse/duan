@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Single neutral wireframe palette. Colours are RGB triplets so Tailwind's
+   `rgb(var(--x) / <alpha>)` utilities work. */
+:root {
+  --color-background: 255 255 255;
+  --color-text: 23 23 23;
+  --color-accent: 37 99 235;
+}
+
+.dark {
+  --color-background: 17 17 17;
+  --color-text: 240 240 240;
+  --color-accent: 59 130 246;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: rgb(var(--color-background));
+  color: rgb(var(--color-text));
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+}
+
+/* Minimal article rendering for react-markdown output (Tailwind preflight
+   resets heading/list styles, so restore readable defaults here). */
+.markdown {
+  line-height: 1.7;
+}
+.markdown h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 1.25rem 0 0.5rem;
+}
+.markdown h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 1.25rem 0 0.5rem;
+}
+.markdown h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 1rem 0 0.25rem;
+}
+.markdown p {
+  margin: 0.6rem 0;
+}
+.markdown ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin: 0.6rem 0;
+}
+.markdown ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+  margin: 0.6rem 0;
+}
+.markdown li {
+  margin: 0.2rem 0;
+}
+.markdown a {
+  color: rgb(var(--color-accent));
+  text-decoration: underline;
+}
+.markdown code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: rgb(var(--color-text) / 0.08);
+  padding: 0.1em 0.3em;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+}
+.markdown pre {
+  background: rgb(var(--color-text) / 0.06);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  overflow: auto;
+  margin: 0.6rem 0;
+}
+.markdown pre code {
+  background: transparent;
+  padding: 0;
+}
+.markdown blockquote {
+  border-left: 3px solid rgb(var(--color-text) / 0.2);
+  padding-left: 0.75rem;
+  margin: 0.6rem 0;
+  color: rgb(var(--color-text) / 0.7);
+}
+.markdown hr {
+  border: 0;
+  border-top: 1px solid rgb(var(--color-text) / 0.15);
+  margin: 1rem 0;
+}

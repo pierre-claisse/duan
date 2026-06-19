@@ -1,0 +1,16 @@
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Secrets bundle generated at build time (CI runs scripts/build-secrets.mjs).
+# Never commit the encrypted PAT blob.
+public/secrets.json
+.env
+.env.*
+
+# Editor / OS
+.DS_Store
+*.log
+.vscode/
+.idea/
