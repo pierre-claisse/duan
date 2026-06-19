@@ -8,11 +8,19 @@ réactivité temps réel webhooks/Cloudflare).
 
 Live : https://pierre-claisse.github.io/tuan-yuting/
 
+## Langues
+
+Interface en **mandarin de Taïwan (繁體中文)** par défaut, avec bascule
+**中文 / English** via le sélecteur de la barre de navigation (choix mémorisé).
+Les chaînes sont dans [`src/i18n/translations.ts`](src/i18n/translations.ts) ;
+les dates sont formatées via `Intl` selon la locale.
+
 ## Sections
 
 - **Accueil** (`/`) — vitrine (placeholder neutre pour l'instant).
 - **Blog** (`/blog`, `/blog/:slug`) — public en lecture ; la prof rédige/édite
-  une fois connectée. Articles en **Markdown**.
+  une fois connectée. Articles en **Markdown**. Les **brouillons** sont
+  réellement privés (voir plus bas).
 - **Agenda** (`/agenda`) — **privé**, visible uniquement par la prof connectée
   (cours particuliers qu'elle saisit elle-même). Un visiteur anonyme ne voit pas
   le lien et l'URL directe redirige vers l'accueil.
@@ -24,8 +32,8 @@ Trois dépôts GitHub :
 | Dépôt | Visibilité | Contenu | Accès |
 |---|---|---|---|
 | `tuan-yuting` | public | Code de l'app | — |
-| `tuan-yuting-blog` | **public** | `articles/<slug>.json` + `articles/index.json` | lecture anonyme (raw), écriture via PAT |
-| `tuan-yuting-agenda` | **privé** | `sessions.json` (tableau de cours) | lecture/écriture via PAT |
+| `tuan-yuting-blog` | **public** | Articles **publiés** : `articles/<slug>.json` + `articles/index.json` | lecture anonyme (raw), écriture via PAT |
+| `tuan-yuting-agenda` | **privé** | `sessions.json` (cours) + **brouillons** : `drafts/<slug>.json` + `drafts/index.json` | lecture/écriture via PAT |
 
 - Lecture publique du blog : `raw.githubusercontent.com` (anonyme, sans quota).
 - Écriture (blog + agenda) et lecture de l'agenda : **GitHub Contents API** avec
@@ -62,10 +70,16 @@ Secrets CI requis sur le dépôt `tuan-yuting` : `SYNC_PAT`, `SYNC_PASSWORD`.
 Les coordonnées des dépôts de données sont publiques et vivent dans
 [`src/config.ts`](src/config.ts).
 
-## Limite connue : brouillons
+## Confidentialité des brouillons
 
-Le dépôt du blog est **public**. Un article en brouillon (`published: false`) est
-**masqué** dans l'app (liste publique filtrée, lecture anonyme refusée), mais son
-fichier `articles/<slug>.json` reste techniquement accessible par URL brute à qui
-connaît le slug. Pour une vraie confidentialité des brouillons, il faudrait les
-stocker dans le dépôt privé (évolution possible).
+Un article vit dans **un seul** endroit selon son état :
+- **publié** → dépôt **public** (`articles/…`), lisible de tous ;
+- **brouillon** → dépôt **privé** (`drafts/…`), invisible publiquement et
+  **inaccessible par URL brute** (le fichier n'existe pas dans le dépôt public).
+
+Basculer la case « publié » **déplace** le fichier et son entrée d'index d'un
+dépôt à l'autre. Le PAT *fine-grained* n'ayant accès qu'à ces deux dépôts, le
+dépôt privé de l'agenda sert aussi de stockage des brouillons.
+
+> Note : `raw.githubusercontent.com` met en cache ~5 min ; un article tout juste
+> publié peut n'apparaître aux visiteurs anonymes qu'après ce court délai.

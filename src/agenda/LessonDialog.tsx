@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Trash2, X } from "lucide-react";
 import type { Lesson, LessonStatus } from "../types";
+import { useI18n, type MsgKey } from "../i18n";
 
 export interface LessonDraft {
   date: string;
@@ -21,10 +22,10 @@ interface Props {
   onClose: () => void;
 }
 
-const STATUSES: { value: LessonStatus; label: string }[] = [
-  { value: "scheduled", label: "Programmé" },
-  { value: "done", label: "Effectué" },
-  { value: "cancelled", label: "Annulé" },
+const STATUSES: { value: LessonStatus; key: MsgKey }[] = [
+  { value: "scheduled", key: "status.scheduled" },
+  { value: "done", key: "status.done" },
+  { value: "cancelled", key: "status.cancelled" },
 ];
 const MAX_NOTES = 5000;
 
@@ -37,6 +38,7 @@ export function LessonDialog({
   onDelete,
   onClose,
 }: Props) {
+  const { t } = useI18n();
   const [date, setDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
@@ -93,13 +95,13 @@ export function LessonDialog({
       >
         <div className="flex items-center justify-between border-b border-content/10 px-5 py-4">
           <h2 className="text-lg font-semibold text-content">
-            {isEditing ? "Modifier le cours" : "Ajouter un cours"}
+            {isEditing ? t("lesson.editTitle") : t("lesson.addTitle")}
           </h2>
           <button
             type="button"
             onClick={onClose}
             className="rounded-lg p-1 text-content/40 hover:bg-content/5 hover:text-content"
-            aria-label="Fermer"
+            aria-label={t("common.close")}
           >
             <X className="h-5 w-5" />
           </button>
@@ -108,7 +110,7 @@ export function LessonDialog({
         <div className="space-y-4 overflow-y-auto px-5 py-4">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <label className="block">
-              <span className="mb-1 block text-xs text-content/60">Date</span>
+              <span className="mb-1 block text-xs text-content/60">{t("lesson.date")}</span>
               <input
                 type="date"
                 value={date}
@@ -117,7 +119,7 @@ export function LessonDialog({
               />
             </label>
             <label className="block">
-              <span className="mb-1 block text-xs text-content/60">Début</span>
+              <span className="mb-1 block text-xs text-content/60">{t("lesson.start")}</span>
               <input
                 type="time"
                 step={900}
@@ -127,7 +129,7 @@ export function LessonDialog({
               />
             </label>
             <label className="block">
-              <span className="mb-1 block text-xs text-content/60">Fin</span>
+              <span className="mb-1 block text-xs text-content/60">{t("lesson.end")}</span>
               <input
                 type="time"
                 step={900}
@@ -138,22 +140,22 @@ export function LessonDialog({
             </label>
           </div>
           {startTime !== "" && endTime !== "" && !validTimes && (
-            <p className="text-xs text-red-500">L'heure de fin doit suivre l'heure de début.</p>
+            <p className="text-xs text-red-500">{t("lesson.timeError")}</p>
           )}
 
           <label className="block">
-            <span className="mb-1 block text-xs text-content/60">Élève</span>
+            <span className="mb-1 block text-xs text-content/60">{t("lesson.student")}</span>
             <input
               type="text"
               value={studentName}
               onChange={(e) => setStudentName(e.target.value)}
-              placeholder="Nom de l'élève"
+              placeholder={t("lesson.studentPlaceholder")}
               className="w-full rounded border border-content/20 bg-content/5 px-2 py-2 text-sm text-content placeholder:text-content/30 focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </label>
 
           <div>
-            <span className="mb-2 block text-xs text-content/60">Statut</span>
+            <span className="mb-2 block text-xs text-content/60">{t("lesson.status")}</span>
             <div className="flex flex-wrap gap-2">
               {STATUSES.map((s) => (
                 <button
@@ -166,20 +168,20 @@ export function LessonDialog({
                       : "border-content/20 text-content/60 hover:bg-content/5"
                   }`}
                 >
-                  {s.label}
+                  {t(s.key)}
                 </button>
               ))}
             </div>
           </div>
 
           <label className="block">
-            <span className="mb-1 block text-xs text-content/60">Notes</span>
+            <span className="mb-1 block text-xs text-content/60">{t("lesson.notes")}</span>
             <textarea
               rows={3}
               maxLength={MAX_NOTES}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Notes (facultatif)…"
+              placeholder={t("lesson.notesPlaceholder")}
               className="w-full resize-none rounded border border-content/20 bg-content/5 px-2 py-2 text-sm text-content placeholder:text-content/30 focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </label>
@@ -195,7 +197,7 @@ export function LessonDialog({
                 className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-red-500 hover:bg-red-500/10 disabled:opacity-40"
               >
                 <Trash2 className="h-4 w-4" />
-                Supprimer
+                {t("common.delete")}
               </button>
             )}
           </div>
@@ -205,7 +207,7 @@ export function LessonDialog({
               onClick={onClose}
               className="rounded-lg px-4 py-2 text-sm text-content/60 hover:text-content"
             >
-              Annuler
+              {t("common.cancel")}
             </button>
             <button
               type="button"
@@ -213,7 +215,7 @@ export function LessonDialog({
               disabled={!canSave}
               className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              {saving ? "Enregistrement…" : "Enregistrer"}
+              {saving ? t("common.saving") : t("common.save")}
             </button>
           </div>
         </div>

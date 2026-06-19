@@ -2,6 +2,7 @@
 // to "/"), so we can assume an unlocked PAT here.
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../auth";
+import { useI18n } from "../i18n";
 import { CalendarScreen } from "./CalendarScreen";
 import { DayLessonsPanel } from "./DayLessonsPanel";
 import { LessonDialog, type LessonDraft } from "./LessonDialog";
@@ -17,6 +18,7 @@ interface DialogState {
 
 export function AgendaPage() {
   const { state } = useAuth();
+  const { t } = useI18n();
   const pat = state.status === "unlocked" ? state.pat : null;
 
   const today = todayInZone();
@@ -46,7 +48,7 @@ export function AgendaPage() {
           setSha(res.sha);
         }
       } catch (e) {
-        if (alive) setError(e instanceof Error ? e.message : "Erreur de chargement.");
+        if (alive) setError(e instanceof Error ? e.message : t("common.loadFailed"));
       } finally {
         if (alive) setLoading(false);
       }
@@ -54,7 +56,7 @@ export function AgendaPage() {
     return () => {
       alive = false;
     };
-  }, [pat]);
+  }, [pat, t]);
 
   const persist = useCallback(
     async (next: Lesson[], message: string) => {
@@ -67,12 +69,12 @@ export function AgendaPage() {
         setSha(newSha);
         setDialog((d) => ({ ...d, open: false }));
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Échec de l'enregistrement.");
+        setError(e instanceof Error ? e.message : t("common.saveFailed"));
       } finally {
         setSaving(false);
       }
     },
-    [pat, sha],
+    [pat, sha, t],
   );
 
   const handleSave = useCallback(
@@ -88,8 +90,8 @@ export function AgendaPage() {
       void persist(
         next,
         id === null
-          ? `agenda: nouveau cours (${draft.studentName})`
-          : `agenda: modification du cours #${id}`,
+          ? `agenda: add lesson (${draft.studentName})`
+          : `agenda: update lesson #${id}`,
       );
     },
     [lessons, persist],
@@ -97,10 +99,10 @@ export function AgendaPage() {
 
   const handleDelete = useCallback(
     (id: number) => {
-      if (!window.confirm("Supprimer ce cours ?")) return;
-      void persist(lessons.filter((l) => l.id !== id), `agenda: suppression du cours #${id}`);
+      if (!window.confirm(t("lesson.confirmDelete"))) return;
+      void persist(lessons.filter((l) => l.id !== id), `agenda: delete lesson #${id}`);
     },
-    [lessons, persist],
+    [lessons, persist, t],
   );
 
   const openAdd = () =>
@@ -114,14 +116,14 @@ export function AgendaPage() {
 
   return (
     <section className="py-2">
-      <h1 className="mb-4 text-2xl font-semibold text-content">Agenda</h1>
+      <h1 className="mb-4 text-2xl font-semibold text-content">{t("agenda.title")}</h1>
 
       {error && (
         <p className="mb-4 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-500">{error}</p>
       )}
 
       {loading ? (
-        <p className="py-8 text-center text-sm text-content/40">Chargement…</p>
+        <p className="py-8 text-center text-sm text-content/40">{t("common.loading")}</p>
       ) : (
         <div className="flex flex-col gap-4 md:flex-row md:items-start">
           <div className="min-w-0 flex-1">

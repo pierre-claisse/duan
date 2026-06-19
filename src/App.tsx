@@ -1,16 +1,17 @@
 import { useState } from "react";
 import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import { LoginScreen, useAuth } from "./auth";
+import { useI18n } from "./i18n";
 import { NavBar } from "./components/NavBar";
 import { HomePage } from "./pages/HomePage";
 import { BlogListPage } from "./blog/BlogListPage";
 import { ArticlePage } from "./blog/ArticlePage";
 import { ArticleEditor } from "./blog/ArticleEditor";
 import { AgendaPage } from "./agenda/AgendaPage";
-import { SITE_NAME } from "./config";
 
 function Shell() {
   const { state } = useAuth();
+  const { t } = useI18n();
   const unlocked = state.status === "unlocked";
   const [loginOpen, setLoginOpen] = useState(false);
 
@@ -39,7 +40,7 @@ function Shell() {
         </Routes>
       </main>
       <footer className="border-t border-content/10 py-6 text-center text-xs text-content/40">
-        {SITE_NAME}
+        {t("brand")}
       </footer>
       {loginOpen && <LoginScreen onClose={() => setLoginOpen(false)} />}
     </div>

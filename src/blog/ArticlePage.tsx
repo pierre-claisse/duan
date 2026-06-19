@@ -3,7 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { Pencil, ArrowLeft } from "lucide-react";
 import { useAuth } from "../auth";
-import { loadArticleAuthed, loadArticlePublic } from "./articlesRepo";
+import { useI18n } from "../i18n";
+import { loadArticleEither, loadArticlePublic } from "./articlesRepo";
 import type { Article } from "../types";
 
 type Status = "loading" | "ok" | "notfound" | "error";
@@ -11,6 +12,7 @@ type Status = "loading" | "ok" | "notfound" | "error";
 export function ArticlePage() {
   const { slug = "" } = useParams();
   const { state } = useAuth();
+  const { t } = useI18n();
   const pat = state.status === "unlocked" ? state.pat : null;
   const [article, setArticle] = useState<Article | null>(null);
   const [status, setStatus] = useState<Status>("loading");
@@ -23,12 +25,11 @@ export function ArticlePage() {
     setError(null);
     (async () => {
       try {
-        const a = pat
-          ? (await loadArticleAuthed(pat, slug))?.article ?? null
-          : await loadArticlePublic(slug);
+        // Anonymous visitors only read the public repo, so drafts (which live
+        // in the private repo) are simply not found for them.
+        const a = pat ? await loadArticleEither(pat, slug) : await loadArticlePublic(slug);
         if (!alive) return;
-        // Anonymous visitors never see drafts through the app, even by URL.
-        if (!a || (!pat && !a.published)) {
+        if (!a) {
           setStatus("notfound");
           return;
         }
@@ -36,14 +37,14 @@ export function ArticlePage() {
         setStatus("ok");
       } catch (e) {
         if (!alive) return;
-        setError(e instanceof Error ? e.message : "Erreur de chargement.");
+        setError(e instanceof Error ? e.message : t("common.loadFailed"));
         setStatus("error");
       }
     })();
     return () => {
       alive = false;
     };
-  }, [slug, pat]);
+  }, [slug, pat, t]);
 
   return (
     <article className="py-2">
@@ -52,14 +53,14 @@ export function ArticlePage() {
         className="mb-6 inline-flex items-center gap-1.5 text-sm text-content/60 hover:text-content"
       >
         <ArrowLeft className="h-4 w-4" />
-        Retour au blog
+        {t("article.back")}
       </Link>
 
       {status === "loading" && (
-        <p className="py-8 text-center text-sm text-content/40">Chargement…</p>
+        <p className="py-8 text-center text-sm text-content/40">{t("common.loading")}</p>
       )}
       {status === "notfound" && (
-        <p className="py-8 text-center text-sm text-content/40">Article introuvable.</p>
+        <p className="py-8 text-center text-sm text-content/40">{t("article.notFound")}</p>
       )}
       {status === "error" && (
         <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-500">{error}</p>
@@ -69,16 +70,14 @@ export function ArticlePage() {
         <>
           <header className="mb-6 border-b border-content/10 pb-4">
             <div className="flex items-start justify-between gap-3">
-              <h1 className="text-2xl font-semibold text-content sm:text-3xl">
-                {article.title}
-              </h1>
+              <h1 className="text-2xl font-semibold text-content sm:text-3xl">{article.title}</h1>
               {pat && (
                 <Link
                   to={`/editor/${article.slug}`}
                   className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm text-content/60 hover:bg-content/5 hover:text-content"
                 >
                   <Pencil className="h-3.5 w-3.5" />
-                  Éditer
+                  {t("common.edit")}
                 </Link>
               )}
             </div>
@@ -86,7 +85,7 @@ export function ArticlePage() {
               {article.date}
               {!article.published && (
                 <span className="ml-2 rounded bg-amber-500/15 px-1.5 py-0.5 font-medium text-amber-600 dark:text-amber-300">
-                  brouillon
+                  {t("blog.draft")}
                 </span>
               )}
             </p>

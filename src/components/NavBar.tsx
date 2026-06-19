@@ -4,11 +4,13 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Menu, X, Moon, Sun, LogIn, LogOut } from "lucide-react";
 import { useAuth } from "../auth";
+import { useI18n } from "../i18n";
 import { useTheme } from "../hooks/useTheme";
-import { SITE_NAME } from "../config";
+import { LanguageMenu } from "./LanguageMenu";
 
 export function NavBar({ onLoginClick }: { onLoginClick: () => void }) {
   const { state, signOut } = useAuth();
+  const { t } = useI18n();
   const { dark, toggle } = useTheme();
   const [open, setOpen] = useState(false);
   const unlocked = state.status === "unlocked";
@@ -25,14 +27,14 @@ export function NavBar({ onLoginClick }: { onLoginClick: () => void }) {
   const links = (
     <>
       <NavLink to="/" end className={linkClass} onClick={close}>
-        Accueil
+        {t("nav.home")}
       </NavLink>
       <NavLink to="/blog" className={linkClass} onClick={close}>
-        Blog
+        {t("nav.blog")}
       </NavLink>
       {unlocked && (
         <NavLink to="/agenda" className={linkClass} onClick={close}>
-          Agenda
+          {t("nav.agenda")}
         </NavLink>
       )}
     </>
@@ -40,10 +42,11 @@ export function NavBar({ onLoginClick }: { onLoginClick: () => void }) {
 
   const actions = (
     <>
+      <LanguageMenu onPick={close} />
       <button
         type="button"
         onClick={toggle}
-        aria-label={dark ? "Thème clair" : "Thème sombre"}
+        aria-label={dark ? t("nav.lightMode") : t("nav.darkMode")}
         className="rounded-lg p-2 text-content/70 hover:bg-content/5 hover:text-content"
       >
         {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
@@ -58,7 +61,7 @@ export function NavBar({ onLoginClick }: { onLoginClick: () => void }) {
           className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-content/70 hover:bg-content/5 hover:text-content"
         >
           <LogOut className="h-4 w-4" />
-          Déconnexion
+          {t("nav.logout")}
         </button>
       ) : (
         <button
@@ -70,7 +73,7 @@ export function NavBar({ onLoginClick }: { onLoginClick: () => void }) {
           className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-content/70 hover:bg-content/5 hover:text-content"
         >
           <LogIn className="h-4 w-4" />
-          Connexion prof
+          {t("nav.teacherLogin")}
         </button>
       )}
     </>
@@ -81,7 +84,7 @@ export function NavBar({ onLoginClick }: { onLoginClick: () => void }) {
       <div className="mx-auto max-w-5xl px-4">
         <div className="flex h-14 items-center justify-between">
           <NavLink to="/" className="text-base font-semibold text-content" onClick={close}>
-            {SITE_NAME}
+            {t("brand")}
           </NavLink>
 
           <nav className="hidden items-center gap-1 md:flex">
@@ -94,7 +97,7 @@ export function NavBar({ onLoginClick }: { onLoginClick: () => void }) {
             type="button"
             className="rounded-lg p-2 text-content/70 hover:bg-content/5 md:hidden"
             onClick={() => setOpen((o) => !o)}
-            aria-label="Menu"
+            aria-label={t("nav.menu")}
             aria-expanded={open}
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -104,7 +107,7 @@ export function NavBar({ onLoginClick }: { onLoginClick: () => void }) {
         {open && (
           <nav className="flex flex-col gap-1 pb-3 md:hidden">
             {links}
-            <div className="mt-2 flex items-center gap-1 border-t border-content/10 pt-2">
+            <div className="mt-2 flex flex-wrap items-center gap-1 border-t border-content/10 pt-2">
               {actions}
             </div>
           </nav>

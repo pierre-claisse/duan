@@ -3,7 +3,9 @@
 import { useMemo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Lesson } from "../types";
-import { buildCalendarGrid, monthName, shiftMonth } from "../lib/calendarGrid";
+import { buildCalendarGrid, shiftMonth } from "../lib/calendarGrid";
+import { formatMonthYear, weekdayHeaders } from "../lib/dates";
+import { useI18n, intlLocale } from "../i18n";
 
 interface Props {
   year: number;
@@ -15,8 +17,6 @@ interface Props {
   today: string;
 }
 
-const WEEKDAYS = ["lun", "mar", "mer", "jeu", "ven", "sam", "dim"];
-
 export function CalendarScreen({
   year,
   month,
@@ -26,7 +26,10 @@ export function CalendarScreen({
   onSelectDate,
   today,
 }: Props) {
+  const { t, locale } = useI18n();
+  const bcp47 = intlLocale(locale);
   const grid = useMemo(() => buildCalendarGrid(year, month), [year, month]);
+  const weekdays = useMemo(() => weekdayHeaders(bcp47), [bcp47]);
 
   const countByDate = useMemo(() => {
     const m = new Map<string, number>();
@@ -57,18 +60,18 @@ export function CalendarScreen({
           <button
             type="button"
             onClick={goPrev}
-            aria-label="Mois précédent"
+            aria-label={t("calendar.prevMonth")}
             className="rounded-lg border border-content/20 p-1.5 hover:bg-content/5"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
-          <span className="px-2 text-base font-semibold capitalize sm:text-lg">
-            {monthName(month)} {year}
+          <span className="px-2 text-base font-semibold sm:text-lg">
+            {formatMonthYear(year, month, bcp47)}
           </span>
           <button
             type="button"
             onClick={goNext}
-            aria-label="Mois suivant"
+            aria-label={t("calendar.nextMonth")}
             className="rounded-lg border border-content/20 p-1.5 hover:bg-content/5"
           >
             <ChevronRight className="h-5 w-5" />
@@ -79,13 +82,13 @@ export function CalendarScreen({
           onClick={goToday}
           className="rounded-lg border border-content/20 px-3 py-1.5 text-sm hover:bg-content/5"
         >
-          Aujourd'hui
+          {t("calendar.today")}
         </button>
       </div>
 
       <div className="mb-1 grid grid-cols-7 gap-1">
-        {WEEKDAYS.map((w) => (
-          <div key={w} className="py-1 text-center text-[11px] font-medium text-content/50">
+        {weekdays.map((w, i) => (
+          <div key={i} className="py-1 text-center text-[11px] font-medium text-content/50">
             {w}
           </div>
         ))}
@@ -120,7 +123,7 @@ export function CalendarScreen({
               </span>
               {count > 0 && (
                 <span className="mt-auto self-start rounded bg-accent/15 px-1.5 py-0.5 text-[10px] font-medium text-accent">
-                  {count} cours
+                  {t(count === 1 ? "calendar.lessonsOne" : "calendar.lessonsOther", { n: count })}
                 </span>
               )}
             </button>

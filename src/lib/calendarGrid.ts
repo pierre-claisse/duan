@@ -1,6 +1,5 @@
-// Pure calendar-grid math (copied from hanzi-ruby-lens, month/weekday labels
-// localised to French). No host-timezone dependency: all dates are computed in
-// UTC to avoid drift.
+// Pure calendar-grid math. No host-timezone dependency: all dates are computed
+// in UTC to avoid drift. Locale-aware labels live in src/lib/dates.ts.
 
 export interface CalendarCell {
   date: string; // YYYY-MM-DD
@@ -79,31 +78,4 @@ export function shiftMonth(
   const newYear = Math.floor(totalIdx / 12);
   const newMonth = ((totalIdx % 12) + 12) % 12 + 1;
   return { year: newYear, month: newMonth };
-}
-
-const MONTH_NAMES = [
-  "janvier", "février", "mars", "avril", "mai", "juin",
-  "juillet", "août", "septembre", "octobre", "novembre", "décembre",
-];
-
-export function monthName(month: number): string {
-  return MONTH_NAMES[month - 1];
-}
-
-const WEEKDAYS = [
-  "dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi",
-];
-
-export function formatDateLong(date: string): string {
-  const [y, m, d] = date.split("-").map(Number);
-  // UTC noon to dodge DST edge cases when computing the weekday.
-  const dt = new Date(Date.UTC(y, m - 1, d, 12));
-  return `${WEEKDAYS[dt.getUTCDay()]} ${d} ${monthName(m)} ${y}`;
-}
-
-/** -1 if a < b, 0 if equal, 1 if a > b. Lexicographic compare on 'YYYY-MM-DD'. */
-export function compareDates(a: string, b: string): number {
-  if (a < b) return -1;
-  if (a > b) return 1;
-  return 0;
 }

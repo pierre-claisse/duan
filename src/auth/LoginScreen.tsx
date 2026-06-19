@@ -3,9 +3,11 @@
 import { useCallback, useState } from "react";
 import { X } from "lucide-react";
 import { useAuth } from "./AuthProvider";
+import { useI18n } from "../i18n";
 
 export function LoginScreen({ onClose }: { onClose: () => void }) {
   const { signIn } = useAuth();
+  const { t } = useI18n();
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [inFlight, setInFlight] = useState(false);
@@ -19,18 +21,18 @@ export function LoginScreen({ onClose }: { onClose: () => void }) {
       try {
         const ok = await signIn(password);
         if (ok) onClose();
-        else setError("Mot de passe incorrect.");
+        else setError(t("login.wrongPassword"));
       } catch (err) {
         setError(
-          err instanceof Error
-            ? `Échec du chargement des identifiants : ${err.message}`
-            : "Échec du chargement des identifiants.",
+          t("login.loadError", {
+            msg: err instanceof Error ? err.message : "?",
+          }),
         );
       } finally {
         setInFlight(false);
       }
     },
-    [password, inFlight, signIn, onClose],
+    [password, inFlight, signIn, onClose, t],
   );
 
   return (
@@ -48,20 +50,20 @@ export function LoginScreen({ onClose }: { onClose: () => void }) {
       >
         <div className="flex items-center justify-between border-b border-content/10 px-5 py-4">
           <h2 id="login-title" className="text-lg font-semibold text-content">
-            Connexion prof
+            {t("login.title")}
           </h2>
           <button
             type="button"
             onClick={onClose}
             className="rounded-lg p-1 text-content/40 hover:bg-content/5 hover:text-content"
-            aria-label="Fermer"
+            aria-label={t("common.close")}
           >
             <X className="h-5 w-5" />
           </button>
         </div>
         <div className="space-y-4 px-5 py-4">
           <label className="block">
-            <span className="mb-1 block text-xs text-content/50">Mot de passe</span>
+            <span className="mb-1 block text-xs text-content/50">{t("login.password")}</span>
             <input
               type="password"
               autoComplete="current-password"
@@ -83,7 +85,7 @@ export function LoginScreen({ onClose }: { onClose: () => void }) {
             disabled={!password || inFlight}
             className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {inFlight ? "Connexion…" : "Se connecter"}
+            {inFlight ? t("login.submitting") : t("login.submit")}
           </button>
         </div>
       </form>

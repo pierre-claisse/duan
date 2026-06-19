@@ -13,6 +13,3 @@ export const BRANCH = "main";
 
 /** The professor lives in Taipei; the agenda is shown in her local time. */
 export const TZ = "Asia/Taipei";
-
-/** Placeholder site name (wording not finalised). */
-export const SITE_NAME = "Tuan Yuting";

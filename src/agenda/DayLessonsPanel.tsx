@@ -1,12 +1,13 @@
 import { useMemo } from "react";
 import { Plus, X } from "lucide-react";
 import type { Lesson, LessonStatus } from "../types";
-import { formatDateLong } from "../lib/calendarGrid";
+import { formatLongDate } from "../lib/dates";
+import { useI18n, intlLocale, type MsgKey } from "../i18n";
 
-const STATUS_META: Record<LessonStatus, { label: string; cls: string }> = {
-  scheduled: { label: "Programmé", cls: "bg-blue-500/15 text-blue-600 dark:text-blue-300" },
-  done: { label: "Effectué", cls: "bg-green-500/15 text-green-600 dark:text-green-300" },
-  cancelled: { label: "Annulé", cls: "bg-content/10 text-content/40" },
+const STATUS: Record<LessonStatus, { key: MsgKey; cls: string }> = {
+  scheduled: { key: "status.scheduled", cls: "bg-blue-500/15 text-blue-600 dark:text-blue-300" },
+  done: { key: "status.done", cls: "bg-green-500/15 text-green-600 dark:text-green-300" },
+  cancelled: { key: "status.cancelled", cls: "bg-content/10 text-content/40" },
 };
 
 interface Props {
@@ -18,6 +19,7 @@ interface Props {
 }
 
 export function DayLessonsPanel({ date, lessons, onAdd, onEdit, onClose }: Props) {
+  const { t, locale } = useI18n();
   const dayLessons = useMemo(
     () =>
       lessons
@@ -31,12 +33,12 @@ export function DayLessonsPanel({ date, lessons, onAdd, onEdit, onClose }: Props
   return (
     <div className="rounded-lg border border-content/10">
       <div className="flex items-start justify-between gap-2 border-b border-content/10 px-4 py-3">
-        <p className="text-sm font-semibold capitalize text-content">{formatDateLong(date)}</p>
+        <p className="text-sm font-semibold text-content">{formatLongDate(date, intlLocale(locale))}</p>
         <button
           type="button"
           onClick={onClose}
           className="rounded-lg p-1 text-content/40 hover:bg-content/5 hover:text-content md:hidden"
-          aria-label="Fermer"
+          aria-label={t("common.close")}
         >
           <X className="h-4 w-4" />
         </button>
@@ -49,15 +51,15 @@ export function DayLessonsPanel({ date, lessons, onAdd, onEdit, onClose }: Props
           className="mb-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-accent px-3 py-2 text-sm font-medium text-white hover:opacity-90"
         >
           <Plus className="h-4 w-4" />
-          Ajouter un cours
+          {t("day.addLesson")}
         </button>
 
         {dayLessons.length === 0 ? (
-          <p className="py-6 text-center text-sm text-content/30">Aucun cours ce jour</p>
+          <p className="py-6 text-center text-sm text-content/30">{t("day.empty")}</p>
         ) : (
           <ul className="space-y-2">
             {dayLessons.map((l) => {
-              const meta = STATUS_META[l.status];
+              const meta = STATUS[l.status];
               return (
                 <li key={l.id}>
                   <button
@@ -76,7 +78,7 @@ export function DayLessonsPanel({ date, lessons, onAdd, onEdit, onClose }: Props
                         {l.startTime} – {l.endTime}
                       </span>
                       <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${meta.cls}`}>
-                        {meta.label}
+                        {t(meta.key)}
                       </span>
                     </div>
                     <p className="mt-1 text-sm text-content/80">{l.studentName}</p>

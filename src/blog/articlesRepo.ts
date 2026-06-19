@@ -1,162 +1,167 @@
-// Blog persistence. Layout in the PUBLIC blog repo:
-//   articles/<slug>.json   — one file per article (full body)
-//   articles/index.json    — lightweight manifest for the list view
+// Blog persistence with TRUE draft privacy.
 //
-// Anonymous visitors read via raw.githubusercontent (loadIndexPublic /
-// loadArticlePublic). The professor, signed in, reads + writes via the
-// authenticated Contents API (drafts included). A write updates the article
-// file then the index; rebuildIndex() regenerates the manifest from the files
-// if the two ever drift.
-import { BLOG } from "../config";
+//   Published posts → PUBLIC blog repo:   articles/<slug>.json + articles/index.json
+//   Drafts          → PRIVATE agenda repo: drafts/<slug>.json  + drafts/index.json
+//
+// A post lives in exactly ONE place at a time. Toggling `published` moves the
+// file (and its index entry) between the two repos, so a draft is never present
+// in the public repo and is unreachable by raw URL. (The fine-grained PAT only
+// has access to these two repos, so the private agenda repo doubles as the
+// drafts store.)
+//
+// Anonymous visitors read the public repo via raw.githubusercontent; the
+// professor (signed in) reads/writes both via the authenticated Contents API.
+import { AGENDA, BLOG } from "../config";
 import { readPublicJson } from "../github/publicRead";
 import { getFile, putFile, deleteFile, listDir, GithubError } from "../github/client";
 import type { Article, ArticleMeta } from "../types";
 
-const INDEX_PATH = "articles/index.json";
-const articlePath = (slug: string) => `articles/${slug}.json`;
+interface Place {
+  owner: string;
+  repo: string;
+  dir: string;
+  indexPath: string;
+}
+
+const PUBLISHED: Place = { ...BLOG, dir: "articles", indexPath: "articles/index.json" };
+const DRAFT: Place = { ...AGENDA, dir: "drafts", indexPath: "drafts/index.json" };
+
+const articlePath = (place: Place, slug: string) => `${place.dir}/${slug}.json`;
+const placeFor = (published: boolean) => (published ? PUBLISHED : DRAFT);
+const otherPlace = (published: boolean) => (published ? DRAFT : PUBLISHED);
 
 function toMeta(a: Article): ArticleMeta {
   return { slug: a.slug, title: a.title, date: a.date, published: a.published };
 }
 
-function sortIndex(index: ArticleMeta[]): ArticleMeta[] {
-  // Most recent publication date first; tie-break by slug for stability.
+function sortByDateDesc(index: ArticleMeta[]): ArticleMeta[] {
   return [...index].sort((a, b) =>
     a.date < b.date ? 1 : a.date > b.date ? -1 : a.slug < b.slug ? -1 : 1,
   );
 }
 
-// ── Anonymous (public) reads ───────────────────────────────────────────────
-
-export async function loadIndexPublic(): Promise<ArticleMeta[]> {
-  const idx = await readPublicJson<ArticleMeta[]>(BLOG.owner, BLOG.repo, INDEX_PATH);
-  return Array.isArray(idx) ? sortIndex(idx) : [];
-}
-
-export async function loadArticlePublic(slug: string): Promise<Article | null> {
-  return readPublicJson<Article>(BLOG.owner, BLOG.repo, articlePath(slug));
-}
-
-// ── Authenticated (professor) reads + writes ───────────────────────────────
-
-export interface LoadedIndex {
-  index: ArticleMeta[];
-  sha: string | null;
-}
-
-export async function loadIndexAuthed(pat: string): Promise<LoadedIndex> {
-  const blob = await getFile(pat, BLOG.owner, BLOG.repo, INDEX_PATH);
-  if (!blob) return { index: [], sha: null };
+async function readIndex(
+  pat: string,
+  place: Place,
+): Promise<{ list: ArticleMeta[]; sha: string | null }> {
+  const blob = await getFile(pat, place.owner, place.repo, place.indexPath);
+  if (!blob) return { list: [], sha: null };
   try {
-    const idx = JSON.parse(blob.content) as ArticleMeta[];
-    return { index: Array.isArray(idx) ? sortIndex(idx) : [], sha: blob.sha };
+    const list = JSON.parse(blob.content) as ArticleMeta[];
+    return { list: Array.isArray(list) ? list : [], sha: blob.sha };
   } catch {
-    return { index: [], sha: blob.sha };
+    return { list: [], sha: blob.sha };
   }
 }
 
-export interface LoadedArticle {
-  article: Article;
-  sha: string;
-}
-
-export async function loadArticleAuthed(
+async function writeIndex(
   pat: string,
-  slug: string,
-): Promise<LoadedArticle | null> {
-  const blob = await getFile(pat, BLOG.owner, BLOG.repo, articlePath(slug));
-  if (!blob) return null;
-  try {
-    return { article: JSON.parse(blob.content) as Article, sha: blob.sha };
-  } catch {
-    return null;
-  }
-}
-
-async function putIndex(
-  pat: string,
-  index: ArticleMeta[],
+  place: Place,
+  list: ArticleMeta[],
   sha: string | null,
-): Promise<string> {
-  const content = JSON.stringify(index, null, 2);
+): Promise<void> {
+  const content = JSON.stringify(list, null, 2);
   try {
-    return (await putFile(pat, BLOG.owner, BLOG.repo, INDEX_PATH, content, sha, "blog: mise à jour de l'index")).sha;
+    await putFile(pat, place.owner, place.repo, place.indexPath, content, sha, "blog: mise à jour de l'index");
   } catch (e) {
     if (e instanceof GithubError && e.conflict) {
-      const latest = await getFile(pat, BLOG.owner, BLOG.repo, INDEX_PATH);
-      return (await putFile(pat, BLOG.owner, BLOG.repo, INDEX_PATH, content, latest?.sha ?? null, "blog: mise à jour de l'index")).sha;
+      const latest = await getFile(pat, place.owner, place.repo, place.indexPath);
+      await putFile(pat, place.owner, place.repo, place.indexPath, content, latest?.sha ?? null, "blog: mise à jour de l'index");
+      return;
     }
     throw e;
   }
 }
 
-export interface SaveResult {
-  articleSha: string;
-  indexSha: string;
-  index: ArticleMeta[];
+async function removeFromPlace(pat: string, place: Place, slug: string): Promise<void> {
+  const blob = await getFile(pat, place.owner, place.repo, articlePath(place, slug));
+  if (blob) {
+    await deleteFile(pat, place.owner, place.repo, articlePath(place, slug), blob.sha, `blog: retrait de ${slug}`);
+  }
+  const idx = await readIndex(pat, place);
+  if (idx.list.some((m) => m.slug === slug)) {
+    await writeIndex(pat, place, idx.list.filter((m) => m.slug !== slug), idx.sha);
+  }
 }
 
-/** Write the article file, then refresh the index manifest. */
-export async function saveArticle(
-  pat: string,
-  article: Article,
-  articleSha: string | null,
-  index: ArticleMeta[],
-  indexSha: string | null,
-): Promise<SaveResult> {
-  const res = await putFile(
-    pat,
-    BLOG.owner,
-    BLOG.repo,
-    articlePath(article.slug),
-    JSON.stringify(article, null, 2),
-    articleSha,
-    `blog: enregistrement de « ${article.title} »`,
-  );
-  const nextIndex = sortIndex([
-    ...index.filter((m) => m.slug !== article.slug),
-    toMeta(article),
-  ]);
-  const newIndexSha = await putIndex(pat, nextIndex, indexSha);
-  return { articleSha: res.sha, indexSha: newIndexSha, index: nextIndex };
+// ── Anonymous (public) reads ───────────────────────────────────────────────
+
+export async function loadIndexPublic(): Promise<ArticleMeta[]> {
+  const idx = await readPublicJson<ArticleMeta[]>(PUBLISHED.owner, PUBLISHED.repo, PUBLISHED.indexPath);
+  return Array.isArray(idx) ? sortByDateDesc(idx) : [];
 }
 
-export interface DeleteResult {
-  indexSha: string;
-  index: ArticleMeta[];
+export async function loadArticlePublic(slug: string): Promise<Article | null> {
+  return readPublicJson<Article>(PUBLISHED.owner, PUBLISHED.repo, articlePath(PUBLISHED, slug));
 }
 
-export async function deleteArticle(
-  pat: string,
-  slug: string,
-  articleSha: string,
-  index: ArticleMeta[],
-  indexSha: string | null,
-): Promise<DeleteResult> {
-  await deleteFile(pat, BLOG.owner, BLOG.repo, articlePath(slug), articleSha, `blog: suppression de ${slug}`);
-  const nextIndex = index.filter((m) => m.slug !== slug);
-  const newIndexSha = await putIndex(pat, nextIndex, indexSha);
-  return { indexSha: newIndexSha, index: nextIndex };
+// ── Authenticated (professor) reads ────────────────────────────────────────
+
+/** Merged list for the professor: published posts + private drafts. */
+export async function loadProfIndex(pat: string): Promise<ArticleMeta[]> {
+  const [pub, draft] = await Promise.all([readIndex(pat, PUBLISHED), readIndex(pat, DRAFT)]);
+  return sortByDateDesc([...draft.list, ...pub.list]);
 }
 
-/** Regenerate index.json from the actual article files (drift recovery). */
-export async function rebuildIndex(
-  pat: string,
-  indexSha: string | null,
-): Promise<DeleteResult> {
-  const entries = await listDir(pat, BLOG.owner, BLOG.repo, "articles");
-  const metas: ArticleMeta[] = [];
-  for (const e of entries) {
-    if (e.type !== "file" || !e.name.endsWith(".json") || e.name === "index.json") continue;
-    const blob = await getFile(pat, BLOG.owner, BLOG.repo, e.path);
-    if (!blob) continue;
-    try {
-      metas.push(toMeta(JSON.parse(blob.content) as Article));
-    } catch {
-      /* skip malformed file */
+/** Load a single post by slug, looking in the public repo then the drafts. */
+export async function loadArticleEither(pat: string, slug: string): Promise<Article | null> {
+  for (const place of [PUBLISHED, DRAFT]) {
+    const blob = await getFile(pat, place.owner, place.repo, articlePath(place, slug));
+    if (blob) {
+      try {
+        return JSON.parse(blob.content) as Article;
+      } catch {
+        return null;
+      }
     }
   }
-  const nextIndex = sortIndex(metas);
-  const newIndexSha = await putIndex(pat, nextIndex, indexSha);
-  return { indexSha: newIndexSha, index: nextIndex };
+  return null;
+}
+
+// ── Authenticated (professor) writes ───────────────────────────────────────
+
+/** Write a post to the place matching its `published` flag, and remove any copy
+ *  from the other place (handles publish ⇄ unpublish moves). */
+export async function saveArticle(pat: string, article: Article): Promise<void> {
+  const target = placeFor(article.published);
+  const existing = await getFile(pat, target.owner, target.repo, articlePath(target, article.slug));
+  await putFile(
+    pat,
+    target.owner,
+    target.repo,
+    articlePath(target, article.slug),
+    JSON.stringify(article, null, 2),
+    existing?.sha ?? null,
+    `blog: enregistrement de « ${article.title} »`,
+  );
+  const idx = await readIndex(pat, target);
+  const next = sortByDateDesc([...idx.list.filter((m) => m.slug !== article.slug), toMeta(article)]);
+  await writeIndex(pat, target, next, idx.sha);
+  await removeFromPlace(pat, otherPlace(article.published), article.slug);
+}
+
+/** Delete a post from wherever it lives (both places, idempotently). */
+export async function deleteArticle(pat: string, slug: string): Promise<void> {
+  await removeFromPlace(pat, PUBLISHED, slug);
+  await removeFromPlace(pat, DRAFT, slug);
+}
+
+/** Regenerate both index manifests from the actual files (drift recovery). */
+export async function rebuildIndexes(pat: string): Promise<void> {
+  for (const place of [PUBLISHED, DRAFT]) {
+    const entries = await listDir(pat, place.owner, place.repo, place.dir);
+    const metas: ArticleMeta[] = [];
+    for (const e of entries) {
+      if (e.type !== "file" || !e.name.endsWith(".json") || e.name === "index.json") continue;
+      const blob = await getFile(pat, place.owner, place.repo, e.path);
+      if (!blob) continue;
+      try {
+        metas.push(toMeta(JSON.parse(blob.content) as Article));
+      } catch {
+        /* skip malformed file */
+      }
+    }
+    const idx = await readIndex(pat, place);
+    await writeIndex(pat, place, sortByDateDesc(metas), idx.sha);
+  }
 }
