@@ -1,6 +1,6 @@
 # duan-yuting
 
-Site web de 段予婷 (cours particuliers) : **vitrine**, **agenda** et **blog**.
+Site web de 段予婷 (cours particuliers) : **vitrine**, **calendrier** et **blog**.
 Application React déployée sur GitHub Pages, qui persiste ses données
 gratuitement dans des dépôts GitHub via un *personal access token* chiffré —
 aucun serveur. Modèle technique inspiré de `hanzi-ruby-lens` (sans la
@@ -21,9 +21,9 @@ les dates sont formatées via `Intl` selon la locale.
 - **Blog** (`/blog`, `/blog/:slug`) — public en lecture ; la prof rédige/édite
   une fois connectée. Articles en **Markdown**. Les **brouillons** sont
   réellement privés (voir plus bas).
-- **Agenda** (`/agenda`) — **privé**, visible uniquement par la prof connectée
-  (cours particuliers qu'elle saisit elle-même). Un visiteur anonyme ne voit pas
-  le lien et l'URL directe redirige vers l'accueil.
+- **Calendrier** (`/calendar`) — **privé**, visible uniquement par la prof
+  connectée (cours particuliers qu'elle saisit elle-même). Un visiteur anonyme ne
+  voit pas le lien et l'URL directe redirige vers l'accueil.
 
 ## Architecture des données
 
@@ -33,10 +33,10 @@ Trois dépôts GitHub :
 |---|---|---|---|
 | `duan-yuting` | public | Code de l'app | — |
 | `duan-yuting-blog` | **public** | Articles **publiés** : `articles/<slug>.json` + `articles/index.json` | lecture anonyme (raw), écriture via PAT |
-| `duan-yuting-agenda` | **privé** | `sessions.json` (cours) + **brouillons** : `drafts/<slug>.json` + `drafts/index.json` | lecture/écriture via PAT |
+| `duan-yuting-calendar` | **privé** | `sessions.json` (cours) + **brouillons** : `drafts/<slug>.json` + `drafts/index.json` | lecture/écriture via PAT |
 
 - Lecture publique du blog : `raw.githubusercontent.com` (anonyme, sans quota).
-- Écriture (blog + agenda) et lecture de l'agenda : **GitHub Contents API** avec
+- Écriture (blog + calendrier) et lecture du calendrier : **GitHub Contents API** avec
   le PAT (lecture du SHA puis `PUT`). Une seule éditrice ⇒ pas d'IndexedDB ni
   d'orchestrateur de conflits.
 - **Authentification** : le PAT est chiffré (Argon2id + AES-GCM) dans
@@ -79,7 +79,7 @@ Un article vit dans **un seul** endroit selon son état :
 
 Basculer la case « publié » **déplace** le fichier et son entrée d'index d'un
 dépôt à l'autre. Le PAT *fine-grained* n'ayant accès qu'à ces deux dépôts, le
-dépôt privé de l'agenda sert aussi de stockage des brouillons.
+dépôt privé du calendrier sert aussi de stockage des brouillons.
 
 > Note : `raw.githubusercontent.com` met en cache ~5 min ; un article tout juste
 > publié peut n'apparaître aux visiteurs anonymes qu'après ce court délai.

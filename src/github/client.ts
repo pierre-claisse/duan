@@ -1,5 +1,5 @@
 // Authenticated CRUD against the GitHub Contents API. Used for the private
-// agenda (read+write) and for writing/reading blog articles when the professor
+// calendar (read+write) and for writing/reading blog articles when the professor
 // is signed in. Anonymous public blog reads go through src/github/publicRead.ts.
 //
 // Every PUT/DELETE carries the blob SHA we last saw (GitHub's optimistic-

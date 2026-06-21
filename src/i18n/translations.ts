@@ -20,7 +20,7 @@ const en = {
 
   "nav.home": "Home",
   "nav.blog": "Blog",
-  "nav.agenda": "Schedule",
+  "nav.calendar": "Calendar",
   "nav.teacherLogin": "Teacher sign-in",
   "nav.logout": "Sign out",
   "nav.menu": "Menu",
@@ -70,7 +70,7 @@ const en = {
   "editor.confirmDelete": "Delete this post for good?",
   "editor.notFound": "We couldn't find that post.",
 
-  "agenda.title": "Schedule",
+  "calendar.title": "Calendar",
 
   "calendar.today": "Today",
   "calendar.prevMonth": "Previous month",
@@ -106,7 +106,7 @@ const zhTW: Record<MsgKey, string> = {
 
   "nav.home": "首頁",
   "nav.blog": "部落格",
-  "nav.agenda": "行事曆",
+  "nav.calendar": "行事曆",
   "nav.teacherLogin": "教師登入",
   "nav.logout": "登出",
   "nav.menu": "選單",
@@ -156,7 +156,7 @@ const zhTW: Record<MsgKey, string> = {
   "editor.confirmDelete": "確定要永久刪除這篇文章嗎？",
   "editor.notFound": "找不到這篇文章。",
 
-  "agenda.title": "行事曆",
+  "calendar.title": "行事曆",
 
   "calendar.today": "今天",
   "calendar.prevMonth": "上個月",

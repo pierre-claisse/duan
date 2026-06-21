@@ -1,5 +1,5 @@
-// Professor-only agenda. The route is guarded (anonymous visitors are redirected
-// to "/"), so we can assume an unlocked PAT here.
+// Professor-only calendar. The route is guarded (anonymous visitors are
+// redirected to "/"), so we can assume an unlocked PAT here.
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../auth";
 import { useI18n } from "../i18n";
@@ -16,7 +16,7 @@ interface DialogState {
   defaultDate: string;
 }
 
-export function AgendaPage() {
+export function CalendarPage() {
   const { state } = useAuth();
   const { t } = useI18n();
   const pat = state.status === "unlocked" ? state.pat : null;
@@ -90,8 +90,8 @@ export function AgendaPage() {
       void persist(
         next,
         id === null
-          ? `agenda: add lesson (${draft.studentName})`
-          : `agenda: update lesson #${id}`,
+          ? `calendar: add lesson (${draft.studentName})`
+          : `calendar: update lesson #${id}`,
       );
     },
     [lessons, persist],
@@ -100,7 +100,7 @@ export function AgendaPage() {
   const handleDelete = useCallback(
     (id: number) => {
       if (!window.confirm(t("lesson.confirmDelete"))) return;
-      void persist(lessons.filter((l) => l.id !== id), `agenda: delete lesson #${id}`);
+      void persist(lessons.filter((l) => l.id !== id), `calendar: delete lesson #${id}`);
     },
     [lessons, persist, t],
   );
@@ -116,7 +116,7 @@ export function AgendaPage() {
 
   return (
     <section className="py-2">
-      <h1 className="mb-4 text-2xl font-semibold text-content">{t("agenda.title")}</h1>
+      <h1 className="mb-4 text-2xl font-semibold text-content">{t("calendar.title")}</h1>
 
       {error && (
         <p className="mb-4 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-500">{error}</p>

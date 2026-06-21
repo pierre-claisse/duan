@@ -23,8 +23,8 @@
   ([src/github/publicRead.ts](src/github/publicRead.ts)); authed read/write via
   the Contents API ([src/github/client.ts](src/github/client.ts)).
   `rebuildIndexes()` regenerates both manifests from files if they drift.
-- **Agenda** (private repo `duan-yuting-agenda`): single `sessions.json` array of
-  `Lesson`. Read-modify-write the whole file ([src/agenda/lessonsRepo.ts](src/agenda/lessonsRepo.ts)).
+- **Calendar** (private repo `duan-yuting-calendar`): single `sessions.json` array
+  of `Lesson`. Read-modify-write the whole file ([src/calendar/lessonsRepo.ts](src/calendar/lessonsRepo.ts)).
   (This private repo doubles as the blog drafts store.)
 - Repo coordinates are non-secret → [src/config.ts](src/config.ts). Only the PAT
   is encrypted, in `public/secrets.json` (built by
@@ -37,12 +37,12 @@
 - App is **public by default**. `AuthProvider` holds `{status:"locked"}` until the
   professor signs in via the non-blocking `LoginScreen` (one password → decrypts
   the PAT → `{status:"unlocked", pat}`). Nothing persisted; reload returns to
-  locked. `/editor*` and `/agenda` routes redirect to `/` when locked.
+  locked. `/editor*` and `/calendar` routes redirect to `/` when locked.
 
 ## Conventions
 
 - Mobile-first responsive (unlike hanzi-ruby-lens, which is desktop-only). NavBar
-  collapses < md; agenda is calendar + day panel (stacked on mobile, side-by-side
+  collapses < md; the calendar is a month grid + day panel (stacked on mobile, side-by-side
   ≥ md); dialogs are bottom-sheet on mobile.
 - Neutral wireframe palette: CSS vars `surface`/`content`/`accent`, dark mode via
   `<html class="dark">` (toggle in NavBar, synchronous boot script in index.html).

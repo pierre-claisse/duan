@@ -5,7 +5,7 @@
 //   blob = AES-GCM-encrypt({ pat }, Argon2id(password))
 //
 // The professor types her password in the LoginScreen; if it decrypts the
-// blob she gets the GitHub PAT (read+write on the blog + agenda data repos).
+// blob she gets the GitHub PAT (read+write on the blog + calendar data repos).
 // The plaintext PAT stays in memory only — never localStorage, never disk.
 //
 // Repo coordinates are NOT secret and live in src/config.ts; only the PAT is

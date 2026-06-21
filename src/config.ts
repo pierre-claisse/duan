@@ -5,11 +5,11 @@
 /** Public repo holding blog articles — read anonymously via raw.githubusercontent. */
 export const BLOG = { owner: "pierre-claisse", repo: "duan-yuting-blog" } as const;
 
-/** Private repo holding the agenda — read/written only with the PAT. */
-export const AGENDA = { owner: "pierre-claisse", repo: "duan-yuting-agenda" } as const;
+/** Private repo holding the calendar — read/written only with the PAT. */
+export const CALENDAR = { owner: "pierre-claisse", repo: "duan-yuting-calendar" } as const;
 
 /** Default branch of the data repos. */
 export const BRANCH = "main";
 
-/** The professor lives in Taipei; the agenda is shown in her local time. */
+/** The professor lives in Taipei; the calendar is shown in her local time. */
 export const TZ = "Asia/Taipei";

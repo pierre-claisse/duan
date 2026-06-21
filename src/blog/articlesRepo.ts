@@ -1,17 +1,17 @@
 // Blog persistence with TRUE draft privacy.
 //
 //   Published posts → PUBLIC blog repo:   articles/<slug>.json + articles/index.json
-//   Drafts          → PRIVATE agenda repo: drafts/<slug>.json  + drafts/index.json
+//   Drafts          → PRIVATE calendar repo: drafts/<slug>.json  + drafts/index.json
 //
 // A post lives in exactly ONE place at a time. Toggling `published` moves the
 // file (and its index entry) between the two repos, so a draft is never present
 // in the public repo and is unreachable by raw URL. (The fine-grained PAT only
-// has access to these two repos, so the private agenda repo doubles as the
+// has access to these two repos, so the private calendar repo doubles as the
 // drafts store.)
 //
 // Anonymous visitors read the public repo via raw.githubusercontent; the
 // professor (signed in) reads/writes both via the authenticated Contents API.
-import { AGENDA, BLOG } from "../config";
+import { CALENDAR, BLOG } from "../config";
 import { readPublicJson } from "../github/publicRead";
 import { getFile, putFile, deleteFile, listDir, GithubError } from "../github/client";
 import type { Article, ArticleMeta } from "../types";
@@ -24,7 +24,7 @@ interface Place {
 }
 
 const PUBLISHED: Place = { ...BLOG, dir: "articles", indexPath: "articles/index.json" };
-const DRAFT: Place = { ...AGENDA, dir: "drafts", indexPath: "drafts/index.json" };
+const DRAFT: Place = { ...CALENDAR, dir: "drafts", indexPath: "drafts/index.json" };
 
 const articlePath = (place: Place, slug: string) => `${place.dir}/${slug}.json`;
 const placeFor = (published: boolean) => (published ? PUBLISHED : DRAFT);

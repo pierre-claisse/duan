@@ -7,7 +7,7 @@ import { HomePage } from "./pages/HomePage";
 import { BlogListPage } from "./blog/BlogListPage";
 import { ArticlePage } from "./blog/ArticlePage";
 import { ArticleEditor } from "./blog/ArticleEditor";
-import { AgendaPage } from "./agenda/AgendaPage";
+import { CalendarPage } from "./calendar/CalendarPage";
 
 function Shell() {
   const { state } = useAuth();
@@ -23,7 +23,7 @@ function Shell() {
           <Route path="/" element={<HomePage />} />
           <Route path="/blog" element={<BlogListPage />} />
           <Route path="/blog/:slug" element={<ArticlePage />} />
-          {/* Editor + Agenda are professor-only; anonymous URLs redirect home. */}
+          {/* Editor + Calendar are professor-only; anonymous URLs redirect home. */}
           <Route
             path="/editor"
             element={unlocked ? <ArticleEditor /> : <Navigate to="/" replace />}
@@ -33,8 +33,8 @@ function Shell() {
             element={unlocked ? <ArticleEditor /> : <Navigate to="/" replace />}
           />
           <Route
-            path="/agenda"
-            element={unlocked ? <AgendaPage /> : <Navigate to="/" replace />}
+            path="/calendar"
+            element={unlocked ? <CalendarPage /> : <Navigate to="/" replace />}
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

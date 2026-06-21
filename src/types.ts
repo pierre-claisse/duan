@@ -2,8 +2,8 @@
 
 export type LessonStatus = "scheduled" | "done" | "cancelled";
 
-/** A private lesson the professor records in her agenda. Stored as one entry in
- *  `sessions.json` (a single JSON array) in the private agenda repo. Times are
+/** A private lesson the professor records in her calendar. Stored as one entry in
+ *  `sessions.json` (a single JSON array) in the private calendar repo. Times are
  *  wall-clock in the professor's timezone (Asia/Taipei), stored as entered. */
 export interface Lesson {
   id: number; // Date.now() at creation
