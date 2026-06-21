@@ -16,7 +16,7 @@ export const LANGUAGE_NAMES: Record<Locale, string> = {
 };
 
 const en = {
-  brand: "Tuan Yuting",
+  brand: "Duan Yuting",
 
   "nav.home": "Home",
   "nav.blog": "Blog",

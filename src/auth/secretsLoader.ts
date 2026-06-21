@@ -12,7 +12,7 @@ async function fetchSecretsFile(): Promise<SecretsFile> {
   if (filePromise) return filePromise;
   filePromise = (async () => {
     // `import.meta.env.BASE_URL` is inlined by Vite with the configured base
-    // (e.g. "/tuan-yuting/"). Keep it written literally so the substitution works.
+    // (e.g. "/duan-yuting/"). Keep it written literally so the substitution works.
     const url = `${import.meta.env.BASE_URL}${SECRETS_PATH}`;
     const resp = await fetch(url, { cache: "no-store" });
     if (!resp.ok) {

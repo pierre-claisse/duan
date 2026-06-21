@@ -37,8 +37,8 @@ jobs:
       - name: Vite build
         env:
           # So static assets resolve under
-          # https://pierre-claisse.github.io/tuan-yuting/
-          VITE_BASE: /tuan-yuting/
+          # https://pierre-claisse.github.io/duan-yuting/
+          VITE_BASE: /duan-yuting/
         run: npm run build
 
       - uses: actions/configure-pages@v5

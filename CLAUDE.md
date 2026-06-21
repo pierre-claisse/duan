@@ -1,4 +1,4 @@
-# tuan-yuting — Guidelines
+# duan-yuting — Guidelines
 
 ## Stack
 
@@ -23,7 +23,7 @@
   ([src/github/publicRead.ts](src/github/publicRead.ts)); authed read/write via
   the Contents API ([src/github/client.ts](src/github/client.ts)).
   `rebuildIndexes()` regenerates both manifests from files if they drift.
-- **Agenda** (private repo `tuan-yuting-agenda`): single `sessions.json` array of
+- **Agenda** (private repo `duan-yuting-agenda`): single `sessions.json` array of
   `Lesson`. Read-modify-write the whole file ([src/agenda/lessonsRepo.ts](src/agenda/lessonsRepo.ts)).
   (This private repo doubles as the blog drafts store.)
 - Repo coordinates are non-secret → [src/config.ts](src/config.ts). Only the PAT
