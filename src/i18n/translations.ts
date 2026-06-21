@@ -47,7 +47,6 @@ const en = {
   "login.loadError": "Couldn't load your credentials: {msg}",
 
   "blog.title": "Blog",
-  "blog.rebuildIndex": "Rebuild index",
   "blog.newPost": "New post",
   "blog.empty": "No posts yet.",
 
@@ -102,7 +101,6 @@ const zhTW: Record<MsgKey, string> = {
   "login.loadError": "無法載入登入資訊：{msg}",
 
   "blog.title": "部落格",
-  "blog.rebuildIndex": "重建索引",
   "blog.newPost": "撰寫文章",
   "blog.empty": "目前還沒有文章。",
 

@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Pencil, RefreshCw } from "lucide-react";
+import { Plus, Pencil } from "lucide-react";
 import { useAuth } from "../auth";
 import { useI18n } from "../i18n";
-import { loadIndexPublic, loadIndexAuthed, rebuildIndex } from "./articlesRepo";
+import { loadIndexPublic, loadIndexAuthed } from "./articlesRepo";
 import type { ArticleMeta } from "../types";
 
 export function BlogListPage() {
@@ -12,42 +12,22 @@ export function BlogListPage() {
   const pat = state.status === "unlocked" ? state.pat : null;
   const [items, setItems] = useState<ArticleMeta[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [rebuilding, setRebuilding] = useState(false);
-
-  const load = useCallback(async () => {
-    setItems(null);
-    setError(null);
-    try {
-      const index = pat ? await loadIndexAuthed(pat) : await loadIndexPublic();
-      setItems(index);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : t("common.loadFailed"));
-    }
-  }, [pat, t]);
 
   useEffect(() => {
     let alive = true;
-    void (async () => {
-      await load();
-      if (!alive) return;
+    setItems(null);
+    setError(null);
+    (async () => {
+      try {
+        const index = pat ? await loadIndexAuthed(pat) : await loadIndexPublic();
+        if (alive) setItems(index);
+      } catch (e) {
+        if (alive) setError(e instanceof Error ? e.message : t("common.loadFailed"));
+      }
     })();
     return () => {
       alive = false;
     };
-  }, [load]);
-
-  const handleRebuild = useCallback(async () => {
-    if (!pat) return;
-    setRebuilding(true);
-    setError(null);
-    try {
-      const next = await rebuildIndex(pat);
-      setItems(next);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : t("common.saveFailed"));
-    } finally {
-      setRebuilding(false);
-    }
   }, [pat, t]);
 
   return (
@@ -55,24 +35,13 @@ export function BlogListPage() {
       <div className="mb-6 flex items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-content">{t("blog.title")}</h1>
         {pat && (
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleRebuild}
-              disabled={rebuilding}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-content/20 px-3 py-2 text-sm text-content/70 hover:bg-content/5 disabled:opacity-40"
-            >
-              <RefreshCw className={`h-4 w-4 ${rebuilding ? "animate-spin" : ""}`} />
-              <span className="hidden sm:inline">{t("blog.rebuildIndex")}</span>
-            </button>
-            <Link
-              to="/editor"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-3 py-2 text-sm font-medium text-white hover:opacity-90"
-            >
-              <Plus className="h-4 w-4" />
-              {t("blog.newPost")}
-            </Link>
-          </div>
+          <Link
+            to="/editor"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-3 py-2 text-sm font-medium text-white hover:opacity-90"
+          >
+            <Plus className="h-4 w-4" />
+            {t("blog.newPost")}
+          </Link>
         )}
       </div>
 
