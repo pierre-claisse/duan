@@ -16,7 +16,7 @@ export const LANGUAGE_NAMES: Record<Locale, string> = {
 };
 
 const en = {
-  brand: "Duan Yuting",
+  brand: "Duan",
 
   "nav.home": "Home",
   "nav.blog": "Blog",
@@ -102,7 +102,7 @@ const en = {
 export type MsgKey = keyof typeof en;
 
 const zhTW: Record<MsgKey, string> = {
-  brand: "段予婷",
+  brand: "段",
 
   "nav.home": "首頁",
   "nav.blog": "部落格",

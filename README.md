@@ -1,6 +1,6 @@
 # duan
 
-Site web de 段予婷 (cours particuliers) : **vitrine**, **calendrier** et **blog**.
+Site web de 段 (cours particuliers) : **vitrine**, **calendrier** et **blog**.
 Application React déployée sur GitHub Pages, qui persiste ses données
 gratuitement dans des dépôts GitHub via un *personal access token* chiffré —
 aucun serveur. Modèle technique inspiré de `hanzi-ruby-lens` (sans la
