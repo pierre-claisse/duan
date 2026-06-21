@@ -15,12 +15,10 @@ import {
   Gyro,
   ImagePlaceholder,
   renderGyro,
-  Rule,
 } from "../home/primitives";
 import { scrollToSection, type SectionJump } from "../lib/scrollToSection";
 
 // ---- Static content (hoisted out of render so it isn't re-allocated) -------
-type Credential = { yr: string; cjk: string; en: string };
 type Session = {
   eyebrow: string;
   cjk: string;
@@ -32,12 +30,6 @@ type Session = {
   mark?: string;
 };
 type ArticlePreview = { date: string; cjk: string; en: string; excerpt: string };
-
-const CREDENTIALS: Credential[] = [
-  { yr: "2018—", cjk: "自由譯者（中英）", en: "Freelance translator, Mandarin ↔ English" },
-  { yr: "2017", cjk: "社會學碩士．國立臺灣大學", en: "M.A. Sociology, National Taiwan University" },
-  { yr: "2014—", cjk: "長期身體實踐：芭蕾、現代舞、瑜伽", en: "Long-term practice: ballet, modern, yoga" },
-];
 
 const SESSIONS: Session[] = [
   {
@@ -89,7 +81,7 @@ function Hero({ onJump }: { onJump: SectionJump }) {
   return (
     <section className="hero" id="top">
       <div className="hero-photo">
-        <ImagePlaceholder aspect="auto" tone="moss" caption="Photo · morning light through fronds, hands in sphere" />
+        <ImagePlaceholder aspect="auto" tone="moss" />
       </div>
       <div className="hero-inner">
         <Eyebrow cjk={<><Gyro /> 認證指導</>} en="Certified trainer · Taipei" />
@@ -151,18 +143,6 @@ function About() {
                 Mandarin and English.
               </em>
             </p>
-            <Rule />
-            <ul className="cred-list">
-              {CREDENTIALS.map((c) => (
-                <li key={c.yr} className="cred-item">
-                  <span className="cred-yr">{c.yr}</span>
-                  <span className="cred-body">
-                    <span className="cred-cjk">{c.cjk}</span>
-                    <span className="cred-en">{c.en}</span>
-                  </span>
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
       </div>

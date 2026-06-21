@@ -3,6 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      Content Security Policy (defence in depth). The app renders no raw HTML
+      (react-markdown without rehype-raw, no dangerouslySetInnerHTML), so the
+      key win here is confining network traffic: even if a script somehow ran,
+      connect-src only allows GitHub, so the in-memory PAT can't be exfiltrated
+      to a third-party host. 'unsafe-inline' is needed for the two boot scripts
+      below and for React/Tailwind inline styles; it's acceptable because the
+      injection surface is already closed. (frame-ancestors / X-Frame-Options
+      need an HTTP header, which static Pages can't set.)
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self';
+               base-uri 'self';
+               object-src 'none';
+               img-src 'self' data:;
+               font-src https://fonts.gstatic.com;
+               style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+               script-src 'self' 'unsafe-inline';
+               connect-src 'self' https://api.github.com https://raw.githubusercontent.com;
+               form-action 'self';"
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="theme-color" content="#faf8f3" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#14170f" media="(prefers-color-scheme: dark)" />
     <title>段 / Duan</title>

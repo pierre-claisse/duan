@@ -18,8 +18,8 @@ type NavItem =
 const ITEMS: NavItem[] = [
   { kind: "section", id: "about", cjk: "關於", en: "About" },
   { kind: "section", id: "activity", cjk: "課程與文字", en: "Activity" },
-  { kind: "route", to: "/blog", id: "blog", cjk: "部落格", en: "Blog" },
   { kind: "section", id: "contact", cjk: "聯絡", en: "Contact" },
+  { kind: "route", to: "/blog", id: "blog", cjk: "部落格", en: "Blog" },
 ];
 
 export function NavBar({ onLoginClick }: { onLoginClick: () => void }) {
