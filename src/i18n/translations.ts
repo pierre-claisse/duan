@@ -1,19 +1,6 @@
-// UI string catalogue. Two locales: Taiwanese Mandarin (Traditional Chinese,
-// the default) and English. Strings are written to read naturally in each
-// language — not literal translations of one another.
-//
-// `zhTW` is typed against the keys of `en`, so the compiler flags any key that
-// is missing from (or extra in) either locale.
-
-export type Locale = "zh-TW" | "en";
-export const LOCALES: Locale[] = ["zh-TW", "en"];
-export const DEFAULT_LOCALE: Locale = "zh-TW";
-
-/** Language names shown in the switcher (each in its own script, locale-stable). */
-export const LANGUAGE_NAMES: Record<Locale, string> = {
-  "zh-TW": "中文",
-  en: "English",
-};
+// Bilingual UI strings. Every label is shown at once as "中文 / English" — there
+// is no language switch. `zhTW` is typed against the keys of `en`, so the
+// compiler flags any key missing from (or extra in) either language.
 
 const en = {
   brand: "Duan",
@@ -121,7 +108,24 @@ const zhTW: Record<MsgKey, string> = {
   "editor.notFound": "找不到這篇文章。",
 };
 
-export const messages: Record<Locale, Record<MsgKey, string>> = {
-  "zh-TW": zhTW,
-  en,
-};
+// Pre-joined "中文 / English" labels shown everywhere (no switch).
+const bilingual = Object.fromEntries(
+  (Object.keys(en) as MsgKey[]).map((k) => [k, `${zhTW[k]} / ${en[k]}`]),
+) as Record<MsgKey, string>;
+
+/** Bilingual label for `key`, substituting `{param}` placeholders in both
+ *  languages. */
+export function t(key: MsgKey, params?: Record<string, string | number>): string {
+  let s = bilingual[key] ?? key;
+  if (params) {
+    for (const [k, v] of Object.entries(params)) {
+      s = s.replace(new RegExp(`\\{${k}\\}`, "g"), String(v));
+    }
+  }
+  return s;
+}
+
+/** Hook-shaped accessor so components stay `const { t } = useI18n()`. */
+export function useI18n(): { t: typeof t } {
+  return { t };
+}

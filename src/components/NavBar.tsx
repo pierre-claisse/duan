@@ -5,7 +5,6 @@ import { Menu, X, Moon, Sun, LogIn, LogOut } from "lucide-react";
 import { useAuth } from "../auth";
 import { useI18n } from "../i18n";
 import { useTheme } from "../hooks/useTheme";
-import { LanguageMenu } from "./LanguageMenu";
 
 export function NavBar({ onLoginClick }: { onLoginClick: () => void }) {
   const { state, signOut } = useAuth();
@@ -36,7 +35,6 @@ export function NavBar({ onLoginClick }: { onLoginClick: () => void }) {
 
   const actions = (
     <>
-      <LanguageMenu onPick={close} />
       <button
         type="button"
         onClick={toggle}
