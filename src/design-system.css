@@ -1,0 +1,309 @@
+/* =============================================================================
+   段予婷 GYROKINESIS Design System — Tokens + Base Styles
+   ----------------------------------------------------------------------------
+   Imported from the Claude Design project "段予婷 GYROKINESIS Design System".
+   Light mode:  paper-cream backgrounds, deep ink, sage primary, clay accent.
+   Dark mode:   deep mossy black, warm cream foreground, muted sage primary.
+
+   This app already drives dark mode with the `.dark` class on <html> (set by
+   the synchronous boot script in index.html and toggled by useTheme). So the
+   source design's `[data-theme="dark"]` selector is adapted to `.dark` here,
+   and the legacy Tailwind tokens (--color-background / --color-text /
+   --color-accent) are remapped onto this palette so the Blog adopts the look
+   automatically.
+   ========================================================================= */
+
+/* -- Type imports ----------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;600&family=Noto+Serif+TC:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap');
+
+/* -- Light mode (default) --------------------------------------------------- */
+:root {
+  /* ---- Brand color: SAGE (the only saturated hue used freely) ---- */
+  --sage-50:  #f3f5ee;
+  --sage-100: #e6ead9;
+  --sage-200: #ccd4b7;
+  --sage-300: #aebb95;
+  --sage-400: #92a079;
+  --sage-500: #7a8c6f;   /* PRIMARY — buttons, links, focused state */
+  --sage-600: #62725a;
+  --sage-700: #4f5e47;
+  --sage-800: #3c4a36;
+  --sage-900: #28321f;
+
+  /* ---- Accent: CLAY (used sparingly — at most 1–2 hits per page) ---- */
+  --clay-50:  #faf2eb;
+  --clay-100: #f1e0cf;
+  --clay-200: #e3c2a6;
+  --clay-300: #d2a282;
+  --clay-400: #c89976;
+  --clay-500: #b9886a;   /* ACCENT */
+  --clay-600: #9c6f4d;
+  --clay-700: #7d553b;
+  --clay-800: #5f3f2c;
+  --clay-900: #422b1e;
+
+  /* ---- Warm neutrals (the workhorse) ---- */
+  --paper-50:  #faf8f3;   /* canvas */
+  --paper-100: #f3efe6;   /* sunken */
+  --paper-200: #e4e0d3;   /* border */
+  --paper-300: #d0ccbe;   /* border-strong */
+  --paper-400: #b3b0a3;
+  --paper-500: #8a8779;
+  --paper-600: #66645a;
+  --paper-700: #4a4843;
+  --paper-800: #2e2d29;
+  --paper-900: #1f2419;   /* deep ink with green tint */
+
+  /* ---- Semantic surfaces ---- */
+  --bg-canvas:    var(--paper-50);
+  --bg-sunken:    var(--paper-100);
+  --bg-surface:   #ffffff;
+  --bg-elevated:  #ffffff;
+  --bg-inverse:   var(--paper-900);
+
+  /* ---- Semantic foreground ---- */
+  --fg-primary:   var(--paper-900);
+  --fg-secondary: #4a5043;
+  --fg-muted:     #7a8071;
+  --fg-subtle:    #b3b5ad;
+  --fg-onAccent:  #ffffff;      /* on sage-500 + */
+  --fg-inverse:   var(--paper-50);
+
+  /* ---- Semantic borders ---- */
+  --border:        var(--paper-200);
+  --border-strong: var(--paper-300);
+  --border-inverse:#2e3328;
+
+  /* ---- Brand semantic ---- */
+  --brand:         var(--sage-500);
+  --brand-hover:   var(--sage-600);
+  --brand-press:   var(--sage-700);
+  --brand-soft:    var(--sage-100);
+  --brand-pale:    var(--sage-50);
+
+  --accent:        var(--clay-500);
+  --accent-hover:  var(--clay-600);
+  --accent-soft:   var(--clay-100);
+
+  /* ---- Status (used very rarely on this brand) ---- */
+  --success: #6f8c5d;
+  --warning: #c39a3a;
+  --danger:  #b25543;
+  --info:    var(--sage-500);
+
+  /* ---- Focus ring ---- */
+  --focus-ring: 0 0 0 3px color-mix(in oklch, var(--sage-500) 35%, transparent);
+
+  /* ---- Shadow (warm-tinted, two-layer, soft) ---- */
+  --shadow-xs: 0 1px 2px rgba(31, 36, 25, 0.04);
+  --shadow-sm: 0 2px 4px rgba(31, 36, 25, 0.05), 0 1px 2px rgba(31, 36, 25, 0.04);
+  --shadow-md: 0 6px 16px rgba(31, 36, 25, 0.07), 0 2px 4px rgba(31, 36, 25, 0.04);
+  --shadow-lg: 0 14px 32px rgba(31, 36, 25, 0.10), 0 4px 8px rgba(31, 36, 25, 0.05);
+  --shadow-xl: 0 24px 56px rgba(31, 36, 25, 0.12), 0 6px 12px rgba(31, 36, 25, 0.06);
+
+  /* ---- Font families ---- */
+  --font-serif-latin: 'Cormorant Garamond', 'EB Garamond', 'Hoefler Text', Georgia, serif;
+  --font-serif-cjk:   'Noto Serif TC', 'Source Han Serif TC', 'PingFang TC', 'Songti TC', serif;
+  --font-sans-latin:  'DM Sans', 'Helvetica Neue', system-ui, sans-serif;
+  --font-sans-cjk:    'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  --font-mono:        'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --font-display:     var(--font-serif-latin), var(--font-serif-cjk);
+  --font-display-cjk: var(--font-serif-cjk), var(--font-serif-latin);
+  --font-body:        var(--font-sans-latin), var(--font-sans-cjk);
+  --font-body-cjk:    var(--font-sans-cjk), var(--font-sans-latin);
+
+  /* ---- Type scale (generous, slow) ---- */
+  --fs-xs:   12px;
+  --fs-sm:   14px;
+  --fs-base: 17px;   /* body */
+  --fs-md:   19px;
+  --fs-lg:   22px;
+  --fs-xl:   28px;
+  --fs-2xl:  36px;
+  --fs-3xl:  48px;
+  --fs-4xl:  64px;
+  --fs-5xl:  84px;
+
+  /* ---- Line heights ---- */
+  --lh-tight:   1.15;
+  --lh-snug:    1.3;
+  --lh-normal:  1.55;
+  --lh-relaxed: 1.7;
+  --lh-loose:   1.85;
+
+  /* ---- Letter spacing ---- */
+  --tracking-tight:  -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.06em;
+  --tracking-wider:  0.14em;
+
+  /* ---- Weights ---- */
+  --w-light:   300;
+  --w-regular: 400;
+  --w-medium:  500;
+  --w-semi:    600;
+
+  /* ---- Spacing — 8px grid ---- */
+  --space-0:  0;
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  24px;
+  --space-6:  32px;
+  --space-7:  48px;
+  --space-8:  64px;
+  --space-9:  96px;
+  --space-10: 128px;
+  --space-11: 160px;
+
+  /* ---- Radii ---- */
+  --radius-xs:   2px;
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   20px;
+  --radius-2xl:  32px;
+  --radius-full: 9999px;
+
+  /* ---- Animation ---- */
+  --ease-out:   cubic-bezier(0.32, 0.72, 0.32, 1);
+  --ease-in:    cubic-bezier(0.6, 0, 0.7, 0.2);
+  --ease-inOut: cubic-bezier(0.5, 0, 0.3, 1);
+
+  --dur-fast:   150ms;
+  --dur-base:   200ms;
+  --dur-slow:   400ms;
+  --dur-slower: 600ms;
+
+  /* ---- Layout ---- */
+  --container:        1120px;
+  --container-prose:  640px;
+  --container-narrow: 840px;
+
+  /* ---- Legacy Tailwind tokens remapped onto the warm palette ----
+     tailwind.config maps surface/content/accent to these RGB triplets, so the
+     whole app (Blog included) inherits the GYROKINESIS palette. */
+  --color-background: 250 248 243;  /* paper-50  #faf8f3 */
+  --color-text:       31 36 25;     /* paper-900 #1f2419 */
+  --color-accent:     122 140 111;  /* sage-500  #7a8c6f */
+}
+
+/* -- Dark mode (keyed off the app's existing `.dark` class) ----------------- */
+.dark {
+  --sage-50:  #2a322a;
+  --sage-100: #344035;
+  --sage-200: #455343;
+  --sage-300: #5a6c56;
+  --sage-400: #788d70;
+  --sage-500: #a8baa0;   /* PRIMARY in dark */
+  --sage-600: #b8c8b0;
+  --sage-700: #c8d6c1;
+  --sage-800: #dde6d6;
+  --sage-900: #ecf1e7;
+
+  --clay-50:  #2e2118;
+  --clay-100: #3d2b1f;
+  --clay-200: #5f3f2c;
+  --clay-300: #7d553b;
+  --clay-400: #b9886a;
+  --clay-500: #d4a886;   /* ACCENT in dark */
+  --clay-600: #e2bb9c;
+  --clay-700: #ecccb1;
+
+  --paper-50:  #f0ede2;
+  --paper-100: #d6d3c5;
+  --paper-200: #424738;
+  --paper-300: #2e3328;
+  --paper-400: #888a7b;
+  --paper-500: #6e7064;
+  --paper-600: #555648;
+  --paper-700: #3a3d31;
+  --paper-800: #252a21;
+  --paper-900: #14170f;
+
+  --bg-canvas:   #14170f;
+  --bg-sunken:   #0d100a;
+  --bg-surface:  #1c2018;
+  --bg-elevated: #252a21;
+  --bg-inverse:  #f0ede2;
+
+  --fg-primary:   #f0ede2;
+  --fg-secondary: #c4c2b3;
+  --fg-muted:     #888a7b;
+  --fg-subtle:    #555648;
+  --fg-onAccent:  #14170f;
+  --fg-inverse:   #14170f;
+
+  --border:        #2e3328;
+  --border-strong: #424738;
+  --border-inverse:#d0ccbe;
+
+  --brand:         var(--sage-500);
+  --brand-hover:   var(--sage-600);
+  --brand-press:   var(--sage-700);
+  --brand-soft:    var(--sage-100);
+  --brand-pale:    var(--sage-50);
+
+  --accent:        var(--clay-500);
+  --accent-hover:  var(--clay-600);
+  --accent-soft:   var(--clay-100);
+
+  --success: #8aa57a;
+  --warning: #d6b260;
+  --danger:  #d27a68;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.30);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.45), 0 2px 4px rgba(0, 0, 0, 0.30);
+  --shadow-lg: 0 14px 32px rgba(0, 0, 0, 0.55), 0 4px 8px rgba(0, 0, 0, 0.35);
+  --shadow-xl: 0 24px 56px rgba(0, 0, 0, 0.60), 0 6px 12px rgba(0, 0, 0, 0.40);
+
+  /* Legacy Tailwind tokens — dark */
+  --color-background: 20 23 15;     /* #14170f */
+  --color-text:       240 237 226;  /* #f0ede2 */
+  --color-accent:     168 186 160;  /* sage-500 dark #a8baa0 */
+}
+
+/* =============================================================================
+   BASE TYPE — applied app-wide so the GYROKINESIS look reaches every page.
+   Tailwind utility classes (.text-2xl, .font-semibold, …) are class selectors
+   and still override these element rules where the Blog sets them explicitly.
+   ========================================================================= */
+body {
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  line-height: var(--lh-relaxed);
+  font-weight: var(--w-regular);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: var(--w-light);
+  letter-spacing: var(--tracking-tight);
+  text-wrap: balance;
+}
+
+p { text-wrap: pretty; }
+
+::selection {
+  background: var(--brand-soft);
+  color: var(--fg-primary);
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
