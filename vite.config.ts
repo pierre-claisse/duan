@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react";
 import { fileURLToPath, URL } from "node:url";
 
 // `VITE_BASE` is provided by the GitHub Actions deploy workflow so the bundle
-// can be hosted under `https://pierre-claisse.github.io/duan-yuting/`.
+// can be hosted under `https://pierre-claisse.github.io/duan/`.
 // Locally it defaults to "/" so `npm run dev` works as expected.
 const base = process.env.VITE_BASE ?? "/";
 

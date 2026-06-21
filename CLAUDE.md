@@ -1,4 +1,4 @@
-# duan-yuting — Guidelines
+# duan — Guidelines
 
 ## Stack
 
@@ -23,7 +23,7 @@
   ([src/github/publicRead.ts](src/github/publicRead.ts)); authed read/write via
   the Contents API ([src/github/client.ts](src/github/client.ts)).
   `rebuildIndexes()` regenerates both manifests from files if they drift.
-- **Calendar** (private repo `duan-yuting-calendar`): single `sessions.json` array
+- **Calendar** (private repo `duan-calendar`): single `sessions.json` array
   of `Lesson`. Read-modify-write the whole file ([src/calendar/lessonsRepo.ts](src/calendar/lessonsRepo.ts)).
   (This private repo doubles as the blog drafts store.)
 - Repo coordinates are non-secret → [src/config.ts](src/config.ts). Only the PAT

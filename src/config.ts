@@ -3,10 +3,10 @@
 // plain text. Only the PAT itself is encrypted (see src/crypto/envelope.ts).
 
 /** Public repo holding blog articles — read anonymously via raw.githubusercontent. */
-export const BLOG = { owner: "pierre-claisse", repo: "duan-yuting-blog" } as const;
+export const BLOG = { owner: "pierre-claisse", repo: "duan-blog" } as const;
 
 /** Private repo holding the calendar — read/written only with the PAT. */
-export const CALENDAR = { owner: "pierre-claisse", repo: "duan-yuting-calendar" } as const;
+export const CALENDAR = { owner: "pierre-claisse", repo: "duan-calendar" } as const;
 
 /** Default branch of the data repos. */
 export const BRANCH = "main";
