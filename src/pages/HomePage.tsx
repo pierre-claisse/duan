@@ -6,7 +6,6 @@
 // NOTE: the Activity article list is placeholder copy for now — wiring it to the
 // real blog is intentionally left for later. The "全部文章 / All" link already
 // points at the live /blog route.
-import { useCallback } from "react";
 import { Link } from "react-router-dom";
 import {
   Arrow,
@@ -18,22 +17,75 @@ import {
   renderGyro,
   Rule,
 } from "../home/primitives";
+import { scrollToSection, type SectionJump } from "../lib/scrollToSection";
 
-// ---- Smooth in-page scroll (HashRouter owns the URL hash, so we scroll by id
-//      manually rather than relying on anchor navigation). ----
-function useJump() {
-  return useCallback((id: string) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const top = el.getBoundingClientRect().top + window.scrollY - 72;
-    window.scrollTo({ top, behavior: "smooth" });
-  }, []);
-}
+// ---- Static content (hoisted out of render so it isn't re-allocated) -------
+type Credential = { yr: string; cjk: string; en: string };
+type Session = {
+  eyebrow: string;
+  cjk: string;
+  en: string;
+  desc: string;
+  enDesc: string;
+  duration: string;
+  price: string;
+  mark?: string;
+};
+type ArticlePreview = { date: string; cjk: string; en: string; excerpt: string };
+
+const CREDENTIALS: Credential[] = [
+  { yr: "2018—", cjk: "自由譯者（中英）", en: "Freelance translator, Mandarin ↔ English" },
+  { yr: "2017", cjk: "社會學碩士．國立臺灣大學", en: "M.A. Sociology, National Taiwan University" },
+  { yr: "2014—", cjk: "長期身體實踐：芭蕾、現代舞、瑜伽", en: "Long-term practice: ballet, modern, yoga" },
+];
+
+const SESSIONS: Session[] = [
+  {
+    eyebrow: "初次見面 · First meeting",
+    cjk: "認識彼此",
+    en: "Getting to know each other",
+    desc: "第一次見面，聊聊你的身體、過去的練習與期待，試一小段引導。沒有壓力。",
+    enDesc: "A first meeting — we talk through your body and what you’re hoping for, then try a short guided sequence.",
+    duration: "45 min",
+    price: "免費 Free",
+    mark: "✻",
+  },
+  {
+    eyebrow: "私人課 · 1‑on‑1",
+    cjk: "一對一課程",
+    en: "One on One session",
+    desc: "完全為你編排的 GYROKINESIS® 課程，從呼吸到螺旋，逐次累積。",
+    enDesc: "A GYROKINESIS® session built entirely around you — from breath to spiral, session by session.",
+    duration: "60 min",
+    price: "NT$ 2,800",
+  },
+  {
+    eyebrow: "線上 · Online",
+    cjk: "線上課程",
+    en: "Online session",
+    desc: "透過視訊指導的 GYROKINESIS® 課程，適合台北以外或國外的學生。建議搭配椅子與墊子。",
+    enDesc: "A GYROKINESIS® session over video for students outside Taipei. A chair and mat are recommended.",
+    duration: "50 min",
+    price: "NT$ 2,200",
+  },
+];
+
+const ARTICLES: ArticlePreview[] = [
+  { date: "2025.04", cjk: "〈坐太久的身體〉", en: "The over‑sitting body", excerpt: "翻譯桌前的身體，如何重新學會旋轉與打開。" },
+  { date: "2025.02", cjk: "〈螺旋是一種思考〉", en: "Spiral as a way of thinking", excerpt: "從社會學到動作，談非線性的身體邏輯。" },
+  { date: "2024.11", cjk: "〈呼吸的方向〉", en: "Which way the breath goes", excerpt: "吐氣先於用力 — 一個常被忽略的順序。" },
+  { date: "2024.09", cjk: "〈從翻譯到身體〉", en: "From translation to the body", excerpt: "兩種語言之間的停頓，與動作之間的停頓。" },
+  { date: "2024.06", cjk: "〈慢，但不鬆〉", en: "Slow, but not slack", excerpt: "緩慢練習裡的張力從何而來。" },
+  { date: "2024.03", cjk: "〈第一堂課我會說的話〉", en: "What I say in a first class", excerpt: "給初學者的三句提醒，關於期待與耐心。" },
+  { date: "2023.12", cjk: "〈把椅子當成同伴〉", en: "The chair as a partner", excerpt: "居家與線上練習裡，一張椅子能做的事。" },
+  { date: "2023.10", cjk: "〈疼痛不是敵人〉", en: "Pain is not the enemy", excerpt: "聽身體說話，而不是急著讓它安靜。" },
+  { date: "2023.07", cjk: "〈關於重複〉", en: "On repetition", excerpt: "同一個動作做第一百次時，發生了什麼。" },
+];
 
 // ============================================================================
 // Hero
 // ============================================================================
-function Hero({ onJump }: { onJump: (id: string) => void }) {
+function Hero({ onJump }: { onJump: SectionJump }) {
   return (
     <section className="hero" id="top">
       <div className="hero-photo">
@@ -70,11 +122,6 @@ function Hero({ onJump }: { onJump: (id: string) => void }) {
 // About
 // ============================================================================
 function About() {
-  const credentials = [
-    { yr: "2018—", cjk: "自由譯者（中英）", en: "Freelance translator, Mandarin ↔ English" },
-    { yr: "2017", cjk: "社會學碩士．國立臺灣大學", en: "M.A. Sociology, National Taiwan University" },
-    { yr: "2014—", cjk: "長期身體實踐：芭蕾、現代舞、瑜伽", en: "Long-term practice: ballet, modern, yoga" },
-  ];
   return (
     <section className="section about" id="about">
       <div className="container">
@@ -106,8 +153,8 @@ function About() {
             </p>
             <Rule />
             <ul className="cred-list">
-              {credentials.map((c, i) => (
-                <li key={i} className="cred-item">
+              {CREDENTIALS.map((c) => (
+                <li key={c.yr} className="cred-item">
                   <span className="cred-yr">{c.yr}</span>
                   <span className="cred-body">
                     <span className="cred-cjk">{c.cjk}</span>
@@ -126,62 +173,7 @@ function About() {
 // ============================================================================
 // Activity — session cards (left) + scrollable article list (right)
 // ============================================================================
-type Session = {
-  eyebrow: string;
-  cjk: string;
-  en: string;
-  desc: string;
-  enDesc: string;
-  duration: string;
-  price: string;
-  mark?: string;
-};
-
-function Activity({ onJump }: { onJump: (id: string) => void }) {
-  const sessions: Session[] = [
-    {
-      eyebrow: "初次見面 · First meeting",
-      cjk: "認識彼此",
-      en: "Getting to know each other",
-      desc: "第一次見面，聊聊你的身體、過去的練習與期待，試一小段引導。沒有壓力。",
-      enDesc: "A first meeting — we talk through your body and what you’re hoping for, then try a short guided sequence.",
-      duration: "45 min",
-      price: "免費 Free",
-      mark: "✻",
-    },
-    {
-      eyebrow: "私人課 · 1‑on‑1",
-      cjk: "一對一課程",
-      en: "One on One session",
-      desc: "完全為你編排的 GYROKINESIS® 課程，從呼吸到螺旋，逐次累積。",
-      enDesc: "A GYROKINESIS® session built entirely around you — from breath to spiral, session by session.",
-      duration: "60 min",
-      price: "NT$ 2,800",
-    },
-    {
-      eyebrow: "線上 · Online",
-      cjk: "線上課程",
-      en: "Online session",
-      desc: "透過視訊指導的 GYROKINESIS® 課程，適合台北以外或國外的學生。建議搭配椅子與墊子。",
-      enDesc: "A GYROKINESIS® session over video for students outside Taipei. A chair and mat are recommended.",
-      duration: "50 min",
-      price: "NT$ 2,200",
-    },
-  ];
-
-  // Placeholder articles — real blog wiring is intentionally deferred.
-  const articles = [
-    { date: "2025.04", cjk: "〈坐太久的身體〉", en: "The over‑sitting body", excerpt: "翻譯桌前的身體，如何重新學會旋轉與打開。" },
-    { date: "2025.02", cjk: "〈螺旋是一種思考〉", en: "Spiral as a way of thinking", excerpt: "從社會學到動作，談非線性的身體邏輯。" },
-    { date: "2024.11", cjk: "〈呼吸的方向〉", en: "Which way the breath goes", excerpt: "吐氣先於用力 — 一個常被忽略的順序。" },
-    { date: "2024.09", cjk: "〈從翻譯到身體〉", en: "From translation to the body", excerpt: "兩種語言之間的停頓，與動作之間的停頓。" },
-    { date: "2024.06", cjk: "〈慢，但不鬆〉", en: "Slow, but not slack", excerpt: "緩慢練習裡的張力從何而來。" },
-    { date: "2024.03", cjk: "〈第一堂課我會說的話〉", en: "What I say in a first class", excerpt: "給初學者的三句提醒，關於期待與耐心。" },
-    { date: "2023.12", cjk: "〈把椅子當成同伴〉", en: "The chair as a partner", excerpt: "居家與線上練習裡，一張椅子能做的事。" },
-    { date: "2023.10", cjk: "〈疼痛不是敵人〉", en: "Pain is not the enemy", excerpt: "聽身體說話，而不是急著讓它安靜。" },
-    { date: "2023.07", cjk: "〈關於重複〉", en: "On repetition", excerpt: "同一個動作做第一百次時，發生了什麼。" },
-  ];
-
+function Activity({ onJump }: { onJump: SectionJump }) {
   return (
     <section className="section activity" id="activity">
       <div className="container">
@@ -198,8 +190,8 @@ function Activity({ onJump }: { onJump: (id: string) => void }) {
         <div className="activity-split">
           {/* LEFT — session cards */}
           <div className="activity-sessions">
-            {sessions.map((s, i) => (
-              <article key={i} className="session-card">
+            {SESSIONS.map((s) => (
+              <article key={s.en} className="session-card">
                 {s.mark && <span className="session-mark">{s.mark}</span>}
                 <div className="session-eyebrow">{s.eyebrow}</div>
                 <h3 className="session-ttl-cjk">{s.cjk}</h3>
@@ -227,8 +219,8 @@ function Activity({ onJump }: { onJump: (id: string) => void }) {
                 <Link to="/blog" className="articles-all">全部文章 · All</Link>
               </div>
               <div className="articles-scroll">
-                {articles.map((a, i) => (
-                  <Link key={i} to="/blog" className="article-item">
+                {ARTICLES.map((a) => (
+                  <Link key={a.date} to="/blog" className="article-item">
                     <div className="article-date">{a.date}</div>
                     <h4 className="article-ttl-cjk">{a.cjk}</h4>
                     <div className="article-ttl-en"><em>{a.en}</em></div>
@@ -248,7 +240,8 @@ function Activity({ onJump }: { onJump: (id: string) => void }) {
 // Contact — links out to a contact form (placeholder) + direct channels.
 // ============================================================================
 function Contact() {
-  const FORM_URL = "#"; // TODO: replace with the real contact-form link once provided.
+  // TODO: replace with the real Google Form link once it exists.
+  const FORM_URL = "https://forms.gle/your-google-form-id";
   return (
     <section className="section contact" id="contact">
       <div className="container container-narrow">
@@ -263,14 +256,17 @@ function Contact() {
         </header>
 
         <div className="contact-card">
-          <Button variant="primary" size="lg" as="a" href={FORM_URL} icon={<Arrow />}>
-            前往聯絡表單 · Open contact form
+          <Button
+            variant="primary"
+            size="lg"
+            as="a"
+            href={FORM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            icon={<Arrow />}
+          >
+            填寫 Google 表單 · Fill out the Google Form
           </Button>
-          <p className="contact-soon">
-            表單連結即將開放。
-            <br />
-            <em>Form link coming soon.</em>
-          </p>
 
           <div className="contact-divider"><span>或 · or</span></div>
 
@@ -292,7 +288,7 @@ function Contact() {
 // ============================================================================
 // Footer (home-only — the design's full footer)
 // ============================================================================
-function HomeFooter({ onJump }: { onJump: (id: string) => void }) {
+function HomeFooter({ onJump }: { onJump: SectionJump }) {
   return (
     <footer className="home-footer">
       <div className="container">
@@ -334,14 +330,13 @@ function HomeFooter({ onJump }: { onJump: (id: string) => void }) {
 
 // ============================================================================
 export function HomePage() {
-  const onJump = useJump();
   return (
     <div className="home">
-      <Hero onJump={onJump} />
+      <Hero onJump={scrollToSection} />
       <About />
-      <Activity onJump={onJump} />
+      <Activity onJump={scrollToSection} />
       <Contact />
-      <HomeFooter onJump={onJump} />
+      <HomeFooter onJump={scrollToSection} />
     </div>
   );
 }

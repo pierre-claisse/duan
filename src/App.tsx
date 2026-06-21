@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
-import { HashRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { LoginScreen, useAuth } from "./auth";
 import { useI18n } from "./i18n";
 import { NavBar } from "./components/NavBar";
@@ -10,9 +10,11 @@ import { ArticlePage } from "./blog/ArticlePage";
 import { ArticleEditor } from "./blog/ArticleEditor";
 
 // Inner pages (Blog, editor) keep the centered column; the Home landing page is
-// full-bleed and brings its own footer, so it renders edge-to-edge.
+// full-bleed and brings its own footer, so it renders edge-to-edge. The top nav
+// is fixed (out of flow), so inner pages add top padding to clear it — Home's
+// hero supplies its own clearance.
 function Contained({ children }: { children: ReactNode }) {
-  return <div className="mx-auto w-full max-w-5xl px-4 py-6">{children}</div>;
+  return <div className="mx-auto w-full max-w-5xl px-4 pb-6 pt-24">{children}</div>;
 }
 
 function Shell() {
@@ -54,9 +56,11 @@ function Shell() {
 }
 
 export default function App() {
+  // `BASE_URL` is "/duan/" in the GitHub Pages build and "/" locally, so links
+  // resolve correctly under the project subpath without the "#" hash prefix.
   return (
-    <HashRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Shell />
-    </HashRouter>
+    </BrowserRouter>
   );
 }

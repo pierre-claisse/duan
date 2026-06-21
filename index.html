@@ -7,6 +7,23 @@
     <meta name="theme-color" content="#14170f" media="(prefers-color-scheme: dark)" />
     <title>段 / Duan</title>
     <script>
+      // GitHub Pages SPA fallback decoder (pairs with public/404.html). If we
+      // arrived via the 404 redirect (path encoded as "/?/…"), rewrite the URL
+      // back to the real path before the router boots — no "#" in the address.
+      (function (l) {
+        if (l.search[1] === "/") {
+          var decoded = l.search
+            .slice(1)
+            .split("&")
+            .map(function (s) {
+              return s.replace(/~and~/g, "&");
+            })
+            .join("?");
+          window.history.replaceState(null, null, l.pathname.slice(0, -1) + decoded + l.hash);
+        }
+      })(window.location);
+    </script>
+    <script>
       // Apply the dark/light theme synchronously before React boots so there
       // is no flash of the wrong colours.
       //   duan:theme = "dark" | "light"  (set by the theme toggle)

@@ -92,12 +92,14 @@ export function Arrow() {
   return <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />;
 }
 
-const TONES: Record<string, string> = {
+const TONES = {
   sage: "linear-gradient(135deg, #c8d2bd 0%, #92a079 60%, #4f5e47 100%)",
   paper: "linear-gradient(135deg, #f3efe6 0%, #d0ccbe 60%, #8a8779 100%)",
   clay: "linear-gradient(135deg, #f1e0cf 0%, #d2a282 60%, #9c6f4d 100%)",
   moss: "linear-gradient(135deg, #4f5e47 0%, #28321f 100%)",
-};
+} as const;
+
+type Tone = keyof typeof TONES;
 
 // A warm gradient block that signals where a photo goes — communicates the
 // photographic brief without faking a real photo.
@@ -108,7 +110,7 @@ export function ImagePlaceholder({
 }: {
   aspect?: string;
   caption?: string;
-  tone?: keyof typeof TONES;
+  tone?: Tone;
 }) {
   return (
     <div className="img-ph" style={{ aspectRatio: aspect, background: TONES[tone] }}>

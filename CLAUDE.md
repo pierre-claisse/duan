@@ -3,11 +3,13 @@
 ## Stack
 
 - React 19 + Vite 8 + TypeScript 5 (strict) + Tailwind 3.4.
-- Routing: `react-router-dom` **HashRouter** (robust on GitHub Pages).
+- Routing: `react-router-dom` **BrowserRouter** (clean URLs, no `#`), `basename`
+  = `import.meta.env.BASE_URL`. GitHub Pages SPA fallback via
+  [public/404.html](public/404.html) + a decode shim in [index.html](index.html).
 - Markdown: `react-markdown` (no raw HTML).
 - Crypto: `@noble/hashes` (Argon2id) + WebCrypto (AES-GCM) for the encrypted PAT.
-- i18n: tiny in-house provider ([src/i18n/](src/i18n/)). Default **zh-TW**
-  (Traditional Chinese), switchable to **en**; choice persisted in localStorage.
+- i18n: tiny in-house provider ([src/i18n/](src/i18n/)). **Always-on bilingual** —
+  every label renders as "中文 / English" at once; there is no language switch.
   Strings in `translations.ts` (`zhTW` is typed against `en`'s keys, so a missing
   key fails the build).
 - No IndexedDB, no service worker, no backend. Single editor (the professor).

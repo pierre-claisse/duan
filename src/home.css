@@ -9,6 +9,107 @@
   color: var(--fg-primary);
 }
 
+/* =============================================================================
+   TOP NAV — global (rendered in the app shell, not scoped to .home).
+   Fixed and transparent at the top; blurs in once the page is scrolled.
+   ========================================================================= */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+  padding: var(--space-3) var(--space-5);
+  transition: background var(--dur-slow) var(--ease-out),
+              backdrop-filter var(--dur-slow) var(--ease-out),
+              border-color var(--dur-slow) var(--ease-out);
+  border-bottom: 1px solid transparent;
+}
+.nav-scrolled {
+  background: color-mix(in oklch, var(--bg-canvas) 88%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom-color: var(--border);
+}
+.nav-inner {
+  max-width: var(--container);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+}
+.nav-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+.nav-brand-cjk {
+  font-family: var(--font-serif-cjk);
+  font-weight: 400;
+  font-size: 20px;
+  color: var(--fg-primary);
+  letter-spacing: 0.04em;
+}
+.nav-brand-en {
+  font-family: var(--font-serif-latin);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 14px;
+  color: var(--fg-muted);
+}
+.nav-links {
+  display: flex;
+  gap: var(--space-6);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.nav-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--fg-secondary);
+  text-decoration: none;
+  padding: 6px 0;
+  position: relative;
+  transition: color var(--dur-base) var(--ease-out);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.nav-link:hover { color: var(--fg-primary); }
+.nav-link-en {
+  font-family: var(--font-serif-latin);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--fg-subtle);
+}
+.nav-link.is-active { color: var(--fg-primary); }
+.nav-link.is-active::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: -2px;
+  height: 1px;
+  background: var(--brand);
+}
+.nav-right { display: flex; align-items: center; gap: var(--space-3); }
+.nav-account { white-space: nowrap; }
+.nav-theme {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  width: 36px; height: 36px;
+  flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--fg-secondary);
+  cursor: pointer;
+  transition: all var(--dur-base) var(--ease-out);
+}
+.nav-theme:hover { color: var(--brand); border-color: var(--brand); }
+
 /* -- Generic section pacing ------------------------------------------------- */
 .home .section {
   padding: var(--space-10) 0;
@@ -99,8 +200,8 @@
   text-align: center;
 }
 
-/* -- Buttons ---------------------------------------------------------------- */
-.home .btn {
+/* -- Buttons (global — also used by the top nav, which lives in the app shell) */
+.btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -115,31 +216,31 @@
   white-space: nowrap;
   text-decoration: none;
 }
-.home .btn:focus-visible { box-shadow: var(--focus-ring); }
-.home .btn-sm { padding: 9px 14px; font-size: 13px; }
-.home .btn-md { padding: 12px 22px; font-size: 14px; }
-.home .btn-lg { padding: 16px 28px; font-size: 15px; }
-.home .btn:active { transform: scale(0.98); }
+.btn:focus-visible { box-shadow: var(--focus-ring); }
+.btn-sm { padding: 9px 14px; font-size: 13px; }
+.btn-md { padding: 12px 22px; font-size: 14px; }
+.btn-lg { padding: 16px 28px; font-size: 15px; }
+.btn:active { transform: scale(0.98); }
 
-.home .btn-primary {
+.btn-primary {
   background: var(--brand);
   color: var(--fg-onAccent);
 }
-.home .btn-primary:hover { background: var(--brand-hover); }
-.home .btn-primary:active { background: var(--brand-press); }
+.btn-primary:hover { background: var(--brand-hover); }
+.btn-primary:active { background: var(--brand-press); }
 
-.home .btn-secondary {
+.btn-secondary {
   background: var(--bg-surface);
   color: var(--fg-primary);
   border-color: var(--border-strong);
 }
-.home .btn-secondary:hover { background: var(--brand-pale); border-color: var(--brand); color: var(--brand); }
+.btn-secondary:hover { background: var(--brand-pale); border-color: var(--brand); color: var(--brand); }
 
-.home .btn-ghost {
+.btn-ghost {
   background: transparent;
   color: var(--fg-primary);
 }
-.home .btn-ghost:hover { background: var(--bg-sunken); }
+.btn-ghost:hover { background: var(--bg-sunken); }
 
 /* -- Image placeholder ------------------------------------------------------ */
 .home .img-ph {
@@ -630,6 +731,8 @@
    Responsive
    ========================================================================= */
 @media (max-width: 880px) {
+  .nav-links { display: none; }
+  .nav-account .nav-link-en { display: none; }
   .home .about-grid { grid-template-columns: 1fr; gap: var(--space-6); }
   .home .footer-grid { grid-template-columns: 1fr 1fr; }
   .home .activity-split { grid-template-columns: 1fr; gap: var(--space-6); }

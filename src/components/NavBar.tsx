@@ -1,110 +1,134 @@
-// Mobile-first top navigation. Links collapse behind a hamburger below `md`.
-import { useState } from "react";
-import { NavLink } from "react-router-dom";
-import { Menu, X, Moon, Sun, LogIn, LogOut } from "lucide-react";
+// Top navigation — ported from the Claude Design "段予婷 GYROKINESIS Design
+// System" (ui_kits/website). Fixed, transparent at the top, blurs in on scroll.
+// Section links smooth-scroll the Home page (and route home first when clicked
+// from another page). Additions over the source design: a 部落格 / Blog router
+// link, a 教師登入 / Teacher sign-in control, and the dark/light theme switcher.
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Moon, Sun } from "lucide-react";
 import { useAuth } from "../auth";
-import { useI18n } from "../i18n";
 import { useTheme } from "../hooks/useTheme";
+import { Arrow, Button } from "../home/primitives";
+import { scrollToSection, type SectionJump } from "../lib/scrollToSection";
+
+type NavItem =
+  | { kind: "section"; id: string; cjk: string; en: string }
+  | { kind: "route"; to: string; id: string; cjk: string; en: string };
+
+const ITEMS: NavItem[] = [
+  { kind: "section", id: "about", cjk: "關於", en: "About" },
+  { kind: "section", id: "activity", cjk: "課程與文字", en: "Activity" },
+  { kind: "route", to: "/blog", id: "blog", cjk: "部落格", en: "Blog" },
+  { kind: "section", id: "contact", cjk: "聯絡", en: "Contact" },
+];
 
 export function NavBar({ onLoginClick }: { onLoginClick: () => void }) {
   const { state, signOut } = useAuth();
-  const { t } = useI18n();
   const { dark, toggle } = useTheme();
-  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
   const unlocked = state.status === "unlocked";
+  const onHome = location.pathname === "/";
+  const onBlog = location.pathname.startsWith("/blog");
 
-  const linkClass = ({ isActive }: { isActive: boolean }) =>
-    `block rounded-lg px-3 py-2 text-sm transition-colors ${
-      isActive
-        ? "bg-accent/10 font-medium text-accent"
-        : "text-content/70 hover:bg-content/5 hover:text-content"
-    }`;
+  const [scrolled, setScrolled] = useState(false);
+  const [active, setActive] = useState("top");
 
-  const close = () => setOpen(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
-  const links = (
-    <>
-      <NavLink to="/" end className={linkClass} onClick={close}>
-        {t("nav.home")}
-      </NavLink>
-      <NavLink to="/blog" className={linkClass} onClick={close}>
-        {t("nav.blog")}
-      </NavLink>
-    </>
-  );
+  // Section scroll-spy — only meaningful on the Home page.
+  useEffect(() => {
+    if (!onHome) return;
+    const ids = ["top", "about", "activity", "contact"];
+    const onScroll = () => {
+      let current = "top";
+      for (const id of ids) {
+        const el = document.getElementById(id);
+        if (el && el.getBoundingClientRect().top <= 140) current = id;
+      }
+      setActive(current);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [onHome]);
 
-  const actions = (
-    <>
-      <button
-        type="button"
-        onClick={toggle}
-        aria-label={dark ? t("nav.lightMode") : t("nav.darkMode")}
-        className="rounded-lg p-2 text-content/70 hover:bg-content/5 hover:text-content"
-      >
-        {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-      </button>
-      {unlocked ? (
-        <button
-          type="button"
-          onClick={() => {
-            signOut();
-            close();
-          }}
-          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-content/70 hover:bg-content/5 hover:text-content"
-        >
-          <LogOut className="h-4 w-4" />
-          {t("nav.logout")}
-        </button>
-      ) : (
-        <button
-          type="button"
-          onClick={() => {
-            onLoginClick();
-            close();
-          }}
-          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-content/70 hover:bg-content/5 hover:text-content"
-        >
-          <LogIn className="h-4 w-4" />
-          {t("nav.teacherLogin")}
-        </button>
-      )}
-    </>
-  );
+  const onJump: SectionJump = (id) => {
+    if (!onHome) navigate("/");
+    scrollToSection(id);
+  };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-content/10 bg-surface/95 backdrop-blur">
-      <div className="mx-auto max-w-5xl px-4">
-        <div className="flex h-14 items-center justify-between">
-          <NavLink to="/" className="text-base font-semibold text-content" onClick={close}>
-            {t("brand")}
-          </NavLink>
+    <nav className={`nav ${scrolled ? "nav-scrolled" : ""}`}>
+      <div className="nav-inner">
+        <a
+          className="nav-brand"
+          href="#top"
+          onClick={(e) => {
+            e.preventDefault();
+            onJump("top");
+          }}
+        >
+          <span className="nav-brand-cjk">段</span>
+          <span className="nav-brand-en">Duan</span>
+        </a>
 
-          <nav className="hidden items-center gap-1 md:flex">
-            {links}
-            <span className="mx-1 h-5 w-px bg-content/10" />
-            {actions}
-          </nav>
+        <ul className="nav-links">
+          {ITEMS.map((it) =>
+            it.kind === "section" ? (
+              <li key={it.id}>
+                <button
+                  type="button"
+                  className={!onBlog && active === it.id ? "nav-link is-active" : "nav-link"}
+                  onClick={() => onJump(it.id)}
+                >
+                  <span className="nav-link-cjk">{it.cjk}</span>
+                  <span className="nav-link-en">{it.en}</span>
+                </button>
+              </li>
+            ) : (
+              <li key={it.id}>
+                <Link to={it.to} className={onBlog ? "nav-link is-active" : "nav-link"}>
+                  <span className="nav-link-cjk">{it.cjk}</span>
+                  <span className="nav-link-en">{it.en}</span>
+                </Link>
+              </li>
+            ),
+          )}
+        </ul>
 
+        <div className="nav-right">
           <button
             type="button"
-            className="rounded-lg p-2 text-content/70 hover:bg-content/5 md:hidden"
-            onClick={() => setOpen((o) => !o)}
-            aria-label={t("nav.menu")}
-            aria-expanded={open}
+            className="nav-theme"
+            onClick={toggle}
+            aria-label={dark ? "Light mode / 淺色模式" : "Dark mode / 深色模式"}
           >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {dark ? <Sun size={18} /> : <Moon size={18} />}
           </button>
-        </div>
 
-        {open && (
-          <nav className="flex flex-col gap-1 pb-3 md:hidden">
-            {links}
-            <div className="mt-2 flex flex-wrap items-center gap-1 border-t border-content/10 pt-2">
-              {actions}
-            </div>
-          </nav>
-        )}
+          {unlocked ? (
+            <button type="button" className="nav-link nav-account" onClick={signOut}>
+              <span className="nav-link-cjk">登出</span>
+              <span className="nav-link-en">Sign out</span>
+            </button>
+          ) : (
+            <button type="button" className="nav-link nav-account" onClick={onLoginClick}>
+              <span className="nav-link-cjk">教師登入</span>
+              <span className="nav-link-en">Teacher sign-in</span>
+            </button>
+          )}
+
+          <Button variant="primary" size="sm" onClick={() => onJump("contact")} icon={<Arrow />}>
+            聯絡 · Contact
+          </Button>
+        </div>
       </div>
-    </header>
+    </nav>
   );
 }
