@@ -56,8 +56,8 @@ function Shell() {
 }
 
 export default function App() {
-  // `BASE_URL` is "/duan/" in the GitHub Pages build and "/" locally, so links
-  // resolve correctly under the project subpath without the "#" hash prefix.
+  // `BASE_URL` is "/" (the site is served at the root of duan.life), so links
+  // resolve correctly without the "#" hash prefix.
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Shell />

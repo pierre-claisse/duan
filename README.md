@@ -6,12 +6,12 @@ gratuitement dans un dépôt GitHub via un *personal access token* chiffré —
 aucun serveur. Modèle technique inspiré de `hanzi-ruby-lens` (sans la
 réactivité temps réel webhooks/Cloudflare).
 
-Live : https://pierre-claisse.github.io/duan/
+Live : https://duan.life
 
 ## Langues
 
-Interface en **mandarin de Taïwan (繁體中文)** par défaut, avec bascule
-**中文 / English** via le sélecteur de la barre de navigation (choix mémorisé).
+Interface **bilingue permanente** : chaque libellé s'affiche en
+**中文 / English** simultanément — il n'y a pas de sélecteur de langue.
 Les chaînes sont dans [`src/i18n/translations.ts`](src/i18n/translations.ts) ;
 les dates sont formatées via `Intl` selon la locale.
 
@@ -60,8 +60,9 @@ SYNC_PAT='github_pat_…' SYNC_PASSWORD='…' node scripts/build-secrets.mjs
 ## Déploiement
 
 Push sur `main` → GitHub Actions (`.github/workflows/deploy.yml`) :
-`npm ci` → `node scripts/build-secrets.mjs` → `VITE_BASE=/duan/ npm run build`
-→ déploiement Pages.
+`npm ci` → `node scripts/build-secrets.mjs` → `npm run build` (base `/`,
+domaine personnalisé `duan.life` via [`public/CNAME`](public/CNAME)) →
+déploiement Pages.
 
 Secrets CI requis sur le dépôt `duan` : `SYNC_PAT`, `SYNC_PASSWORD`.
 Les coordonnées du dépôt de données sont publiques et vivent dans

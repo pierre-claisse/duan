@@ -35,10 +35,9 @@ jobs:
         run: node scripts/build-secrets.mjs
 
       - name: Vite build
-        env:
-          # So static assets resolve under
-          # https://pierre-claisse.github.io/duan/
-          VITE_BASE: /duan/
+        # The site is served at the root of the custom domain https://duan.life,
+        # so the base stays "/" (vite.config defaults to "/" when VITE_BASE is
+        # unset). Restore VITE_BASE only if hosting moves back to a subpath.
         run: npm run build
 
       - uses: actions/configure-pages@v5
