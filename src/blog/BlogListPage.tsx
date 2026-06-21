@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Plus, Pencil, RefreshCw } from "lucide-react";
 import { useAuth } from "../auth";
 import { useI18n } from "../i18n";
-import { loadIndexPublic, loadProfIndex, rebuildIndexes } from "./articlesRepo";
+import { loadIndexPublic, loadIndexAuthed, rebuildIndex } from "./articlesRepo";
 import type { ArticleMeta } from "../types";
 
 export function BlogListPage() {
@@ -18,7 +18,7 @@ export function BlogListPage() {
     setItems(null);
     setError(null);
     try {
-      const index = pat ? await loadProfIndex(pat) : await loadIndexPublic();
+      const index = pat ? await loadIndexAuthed(pat) : await loadIndexPublic();
       setItems(index);
     } catch (e) {
       setError(e instanceof Error ? e.message : t("common.loadFailed"));
@@ -41,14 +41,14 @@ export function BlogListPage() {
     setRebuilding(true);
     setError(null);
     try {
-      await rebuildIndexes(pat);
-      await load();
+      const next = await rebuildIndex(pat);
+      setItems(next);
     } catch (e) {
       setError(e instanceof Error ? e.message : t("common.saveFailed"));
     } finally {
       setRebuilding(false);
     }
-  }, [pat, load, t]);
+  }, [pat, t]);
 
   return (
     <section className="py-2">
@@ -103,14 +103,7 @@ export function BlogListPage() {
                   >
                     {m.title}
                   </Link>
-                  <p className="mt-1 text-xs text-content/50">
-                    {m.date}
-                    {!m.published && (
-                      <span className="ml-2 rounded bg-amber-500/15 px-1.5 py-0.5 font-medium text-amber-600 dark:text-amber-300">
-                        {t("blog.draft")}
-                      </span>
-                    )}
-                  </p>
+                  <p className="mt-1 text-xs text-content/50">{m.date}</p>
                 </div>
                 {pat && (
                   <Link

@@ -1,6 +1,6 @@
-// Authenticated CRUD against the GitHub Contents API. Used for the private
-// calendar (read+write) and for writing/reading blog articles when the professor
-// is signed in. Anonymous public blog reads go through src/github/publicRead.ts.
+// Authenticated CRUD against the GitHub Contents API. Used for writing/reading
+// blog articles when the professor is signed in. Anonymous public blog reads go
+// through src/github/publicRead.ts.
 //
 // Every PUT/DELETE carries the blob SHA we last saw (GitHub's optimistic-
 // concurrency token). With a single editor a stale SHA is rare; callers re-read

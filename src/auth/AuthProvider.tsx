@@ -1,6 +1,6 @@
 // Holds the unlocked PAT in memory once the professor signs in. Nothing is
 // persisted: a page reload returns to the "locked" (public) state. The app is
-// public by default — being locked only hides edit affordances and the calendar.
+// public by default — being locked only hides edit affordances.
 import {
   createContext,
   useCallback,

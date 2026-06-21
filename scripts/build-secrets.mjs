@@ -2,8 +2,7 @@
 // Actions secrets), produces `public/secrets.json`, which Vite copies into the
 // deployed `dist/`. The file is gitignored.
 //
-//   SYNC_PAT       fine-grained PAT with Contents read+write on the blog and
-//                  calendar data repos
+//   SYNC_PAT       fine-grained PAT with Contents read+write on the blog data repo
 //   SYNC_PASSWORD  the professor's password; she types it to unlock editing
 //
 // Argon2id + AES-GCM parameters MUST match src/crypto/{kdf,aesGcm}.ts.

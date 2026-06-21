@@ -4,7 +4,7 @@ import ReactMarkdown from "react-markdown";
 import { Pencil, ArrowLeft } from "lucide-react";
 import { useAuth } from "../auth";
 import { useI18n } from "../i18n";
-import { loadArticleEither, loadArticlePublic } from "./articlesRepo";
+import { loadArticleAuthed, loadArticlePublic } from "./articlesRepo";
 import type { Article } from "../types";
 
 type Status = "loading" | "ok" | "notfound" | "error";
@@ -25,9 +25,7 @@ export function ArticlePage() {
     setError(null);
     (async () => {
       try {
-        // Anonymous visitors only read the public repo, so drafts (which live
-        // in the private repo) are simply not found for them.
-        const a = pat ? await loadArticleEither(pat, slug) : await loadArticlePublic(slug);
+        const a = pat ? await loadArticleAuthed(pat, slug) : await loadArticlePublic(slug);
         if (!alive) return;
         if (!a) {
           setStatus("notfound");
@@ -81,14 +79,7 @@ export function ArticlePage() {
                 </Link>
               )}
             </div>
-            <p className="mt-2 text-xs text-content/50">
-              {article.date}
-              {!article.published && (
-                <span className="ml-2 rounded bg-amber-500/15 px-1.5 py-0.5 font-medium text-amber-600 dark:text-amber-300">
-                  {t("blog.draft")}
-                </span>
-              )}
-            </p>
+            <p className="mt-2 text-xs text-content/50">{article.date}</p>
           </header>
           <div className="markdown text-content/90">
             <ReactMarkdown>{article.body}</ReactMarkdown>

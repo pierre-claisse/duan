@@ -1,8 +1,8 @@
 # duan
 
-Site web de 段 (cours particuliers) : **vitrine**, **calendrier** et **blog**.
+Site web de 段 (cours particuliers) : **vitrine** et **blog**.
 Application React déployée sur GitHub Pages, qui persiste ses données
-gratuitement dans des dépôts GitHub via un *personal access token* chiffré —
+gratuitement dans un dépôt GitHub via un *personal access token* chiffré —
 aucun serveur. Modèle technique inspiré de `hanzi-ruby-lens` (sans la
 réactivité temps réel webhooks/Cloudflare).
 
@@ -18,27 +18,24 @@ les dates sont formatées via `Intl` selon la locale.
 ## Sections
 
 - **Accueil** (`/`) — vitrine (placeholder neutre pour l'instant).
-- **Blog** (`/blog`, `/blog/:slug`) — public en lecture ; la prof rédige/édite
-  une fois connectée. Articles en **Markdown**. Les **brouillons** sont
-  réellement privés (voir plus bas).
-- **Calendrier** (`/calendar`) — **privé**, visible uniquement par la prof
-  connectée (cours particuliers qu'elle saisit elle-même). Un visiteur anonyme ne
-  voit pas le lien et l'URL directe redirige vers l'accueil.
+- **Blog** (`/blog`, `/blog/:slug`) — public en lecture ; la prof, une fois
+  connectée, rédige / édite / supprime les articles. Contenu en **Markdown**.
 
 ## Architecture des données
 
-Trois dépôts GitHub :
+Deux dépôts GitHub :
 
 | Dépôt | Visibilité | Contenu | Accès |
 |---|---|---|---|
 | `duan` | public | Code de l'app | — |
-| `duan-blog` | **public** | Articles **publiés** : `articles/<slug>.json` + `articles/index.json` | lecture anonyme (raw), écriture via PAT |
-| `duan-calendar` | **privé** | `sessions.json` (cours) + **brouillons** : `drafts/<slug>.json` + `drafts/index.json` | lecture/écriture via PAT |
+| `duan-blog` | **public** | `articles/<slug>.json` + `articles/index.json` | lecture anonyme (raw), écriture via PAT |
 
-- Lecture publique du blog : `raw.githubusercontent.com` (anonyme, sans quota).
-- Écriture (blog + calendrier) et lecture du calendrier : **GitHub Contents API** avec
-  le PAT (lecture du SHA puis `PUT`). Une seule éditrice ⇒ pas d'IndexedDB ni
-  d'orchestrateur de conflits.
+- Lecture publique du blog : `raw.githubusercontent.com` (anonyme, sans quota ;
+  cache CDN ~5 min — un article tout juste publié peut n'apparaître qu'après ce
+  court délai).
+- Écriture et lecture authentifiée : **GitHub Contents API** avec le PAT (lecture
+  du SHA puis `PUT`). Une seule éditrice ⇒ pas d'IndexedDB ni d'orchestrateur de
+  conflits.
 - **Authentification** : le PAT est chiffré (Argon2id + AES-GCM) dans
   `public/secrets.json`, généré au build par `scripts/build-secrets.mjs`. La prof
   saisit un mot de passe pour le déchiffrer ; le PAT reste en mémoire (jamais en
@@ -67,19 +64,5 @@ Push sur `main` → GitHub Actions (`.github/workflows/deploy.yml`) :
 → déploiement Pages.
 
 Secrets CI requis sur le dépôt `duan` : `SYNC_PAT`, `SYNC_PASSWORD`.
-Les coordonnées des dépôts de données sont publiques et vivent dans
+Les coordonnées du dépôt de données sont publiques et vivent dans
 [`src/config.ts`](src/config.ts).
-
-## Confidentialité des brouillons
-
-Un article vit dans **un seul** endroit selon son état :
-- **publié** → dépôt **public** (`articles/…`), lisible de tous ;
-- **brouillon** → dépôt **privé** (`drafts/…`), invisible publiquement et
-  **inaccessible par URL brute** (le fichier n'existe pas dans le dépôt public).
-
-Basculer la case « publié » **déplace** le fichier et son entrée d'index d'un
-dépôt à l'autre. Le PAT *fine-grained* n'ayant accès qu'à ces deux dépôts, le
-dépôt privé du calendrier sert aussi de stockage des brouillons.
-
-> Note : `raw.githubusercontent.com` met en cache ~5 min ; un article tout juste
-> publié peut n'apparaître aux visiteurs anonymes qu'après ce court délai.

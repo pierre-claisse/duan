@@ -20,7 +20,6 @@ const en = {
 
   "nav.home": "Home",
   "nav.blog": "Blog",
-  "nav.calendar": "Calendar",
   "nav.teacherLogin": "Teacher sign-in",
   "nav.logout": "Sign out",
   "nav.menu": "Menu",
@@ -51,7 +50,6 @@ const en = {
   "blog.rebuildIndex": "Rebuild index",
   "blog.newPost": "New post",
   "blog.empty": "No posts yet.",
-  "blog.draft": "Draft",
 
   "article.back": "Back to the blog",
   "article.notFound": "We couldn't find that post.",
@@ -61,7 +59,6 @@ const en = {
   "editor.title": "Title",
   "editor.titlePlaceholder": "Post title",
   "editor.date": "Date",
-  "editor.published": "Published (visible to everyone)",
   "editor.content": "Content (Markdown)",
   "editor.preview": "Preview",
   "editor.editTab": "Edit",
@@ -69,34 +66,6 @@ const en = {
   "editor.empty": "(empty)",
   "editor.confirmDelete": "Delete this post for good?",
   "editor.notFound": "We couldn't find that post.",
-
-  "calendar.title": "Calendar",
-
-  "calendar.today": "Today",
-  "calendar.prevMonth": "Previous month",
-  "calendar.nextMonth": "Next month",
-  "calendar.lessonsOne": "{n} lesson",
-  "calendar.lessonsOther": "{n} lessons",
-
-  "day.addLesson": "Add a lesson",
-  "day.empty": "No lessons this day.",
-
-  "lesson.editTitle": "Edit lesson",
-  "lesson.addTitle": "Add a lesson",
-  "lesson.date": "Date",
-  "lesson.start": "Start",
-  "lesson.end": "End",
-  "lesson.timeError": "The end time has to be after the start time.",
-  "lesson.student": "Student",
-  "lesson.studentPlaceholder": "Student's name",
-  "lesson.status": "Status",
-  "lesson.notes": "Notes",
-  "lesson.notesPlaceholder": "Notes (optional)…",
-  "lesson.confirmDelete": "Delete this lesson?",
-
-  "status.scheduled": "Scheduled",
-  "status.done": "Done",
-  "status.cancelled": "Cancelled",
 } as const;
 
 export type MsgKey = keyof typeof en;
@@ -106,7 +75,6 @@ const zhTW: Record<MsgKey, string> = {
 
   "nav.home": "首頁",
   "nav.blog": "部落格",
-  "nav.calendar": "行事曆",
   "nav.teacherLogin": "教師登入",
   "nav.logout": "登出",
   "nav.menu": "選單",
@@ -137,7 +105,6 @@ const zhTW: Record<MsgKey, string> = {
   "blog.rebuildIndex": "重建索引",
   "blog.newPost": "撰寫文章",
   "blog.empty": "目前還沒有文章。",
-  "blog.draft": "草稿",
 
   "article.back": "返回部落格",
   "article.notFound": "找不到這篇文章。",
@@ -147,7 +114,6 @@ const zhTW: Record<MsgKey, string> = {
   "editor.title": "標題",
   "editor.titlePlaceholder": "文章標題",
   "editor.date": "日期",
-  "editor.published": "發布（所有人皆可閱讀）",
   "editor.content": "內容（Markdown）",
   "editor.preview": "預覽",
   "editor.editTab": "編輯",
@@ -155,34 +121,6 @@ const zhTW: Record<MsgKey, string> = {
   "editor.empty": "（空白）",
   "editor.confirmDelete": "確定要永久刪除這篇文章嗎？",
   "editor.notFound": "找不到這篇文章。",
-
-  "calendar.title": "行事曆",
-
-  "calendar.today": "今天",
-  "calendar.prevMonth": "上個月",
-  "calendar.nextMonth": "下個月",
-  "calendar.lessonsOne": "{n} 堂課",
-  "calendar.lessonsOther": "{n} 堂課",
-
-  "day.addLesson": "新增課程",
-  "day.empty": "這天沒有課程。",
-
-  "lesson.editTitle": "編輯課程",
-  "lesson.addTitle": "新增課程",
-  "lesson.date": "日期",
-  "lesson.start": "開始",
-  "lesson.end": "結束",
-  "lesson.timeError": "結束時間必須晚於開始時間。",
-  "lesson.student": "學生",
-  "lesson.studentPlaceholder": "學生姓名",
-  "lesson.status": "狀態",
-  "lesson.notes": "備註",
-  "lesson.notesPlaceholder": "備註（選填）…",
-  "lesson.confirmDelete": "確定要刪除這堂課嗎？",
-
-  "status.scheduled": "已排定",
-  "status.done": "已完成",
-  "status.cancelled": "已取消",
 };
 
 export const messages: Record<Locale, Record<MsgKey, string>> = {

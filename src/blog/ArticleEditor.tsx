@@ -6,8 +6,8 @@ import { useAuth } from "../auth";
 import { useI18n } from "../i18n";
 import {
   deleteArticle,
-  loadArticleEither,
-  loadProfIndex,
+  loadArticleAuthed,
+  loadIndexAuthed,
   saveArticle,
 } from "./articlesRepo";
 import { uniqueSlug } from "../lib/slug";
@@ -25,7 +25,6 @@ export function ArticleEditor() {
   const [title, setTitle] = useState("");
   const [date, setDate] = useState<string>(() => todayInZone());
   const [body, setBody] = useState("");
-  const [published, setPublished] = useState(false);
   const [preview, setPreview] = useState(false);
 
   const [existingSlugs, setExistingSlugs] = useState<Set<string>>(new Set());
@@ -42,17 +41,16 @@ export function ArticleEditor() {
     setError(null);
     (async () => {
       try {
-        const index = await loadProfIndex(pat);
+        const index = await loadIndexAuthed(pat);
         if (!alive) return;
         setExistingSlugs(new Set(index.map((m) => m.slug)));
         if (editing && slug) {
-          const article = await loadArticleEither(pat, slug);
+          const article = await loadArticleAuthed(pat, slug);
           if (!alive) return;
           if (article) {
             setTitle(article.title);
             setDate(article.date);
             setBody(article.body);
-            setPublished(article.published);
             setCreatedAt(article.createdAt);
           } else {
             setError(t("editor.notFound"));
@@ -84,7 +82,6 @@ export function ArticleEditor() {
         title: title.trim(),
         date,
         body,
-        published,
         createdAt: createdAt ?? now,
         modifiedAt: editing ? now : null,
       };
@@ -94,7 +91,7 @@ export function ArticleEditor() {
       setError(e instanceof Error ? e.message : t("common.saveFailed"));
       setSaving(false);
     }
-  }, [pat, canSave, editing, slug, title, date, body, published, createdAt, existingSlugs, navigate, t]);
+  }, [pat, canSave, editing, slug, title, date, body, createdAt, existingSlugs, navigate, t]);
 
   const handleDelete = useCallback(async () => {
     if (!pat || !editing || !slug) return;
@@ -151,16 +148,6 @@ export function ArticleEditor() {
               />
             </label>
           </div>
-
-          <label className="inline-flex cursor-pointer items-center gap-2">
-            <input
-              type="checkbox"
-              checked={published}
-              onChange={(e) => setPublished(e.target.checked)}
-              className="h-4 w-4 accent-accent"
-            />
-            <span className="text-sm text-content">{t("editor.published")}</span>
-          </label>
 
           <div>
             <div className="mb-1 flex items-center justify-between">

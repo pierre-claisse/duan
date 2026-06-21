@@ -1,5 +1,4 @@
 // Mobile-first top navigation. Links collapse behind a hamburger below `md`.
-// The Calendar link only appears when the professor is signed in.
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Menu, X, Moon, Sun, LogIn, LogOut } from "lucide-react";
@@ -32,11 +31,6 @@ export function NavBar({ onLoginClick }: { onLoginClick: () => void }) {
       <NavLink to="/blog" className={linkClass} onClick={close}>
         {t("nav.blog")}
       </NavLink>
-      {unlocked && (
-        <NavLink to="/calendar" className={linkClass} onClick={close}>
-          {t("nav.calendar")}
-        </NavLink>
-      )}
     </>
   );
 
