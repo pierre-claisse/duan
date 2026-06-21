@@ -8,11 +8,14 @@
     <script>
       // Apply the dark/light theme synchronously before React boots so there
       // is no flash of the wrong colours.
-      //   theme = "dark" | "light"  (set by the theme toggle)
+      //   duan:theme = "dark" | "light"  (set by the theme toggle)
+      // Key is namespaced because GitHub Pages project sites share one origin
+      // (pierre-claisse.github.io) and localStorage is per-origin — a bare
+      // "theme" key would collide with the other apps hosted there.
       // Falls back to the OS preference when no explicit choice is stored.
       (function () {
         try {
-          var stored = localStorage.getItem("theme");
+          var stored = localStorage.getItem("duan:theme");
           var isDark =
             stored === "dark" ||
             (stored !== "light" &&
