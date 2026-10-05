@@ -1,12 +1,11 @@
 # duan — Guidelines
 
-## Status: unpublished
+## Status: published
 
-`duan.life` no longer serves the app — it serves the blank page in [offline/](offline/),
-deployed by [.github/workflows/blank.yml](.github/workflows/blank.yml). The app's
-pipeline is preserved but inert in `.github/workflows/deploy.yml.disabled`. Everything
-below still describes the app, which is untouched; just don't assume a live site.
-See the "Déploiement" section of [README.md](README.md) to republish.
+`duan.life` serves the app, deployed by [.github/workflows/deploy.yml](.github/workflows/deploy.yml)
+on every push to `main`. A kit to take it offline again (a blank page) is kept inert:
+`.github/workflows/blank.yml.disabled` + [offline/](offline/). See the "Déploiement"
+section of [README.md](README.md) to swap between the two.
 
 ## Stack
 

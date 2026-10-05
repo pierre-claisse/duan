@@ -6,8 +6,7 @@ gratuitement dans un dépôt GitHub via un *personal access token* chiffré —
 aucun serveur. Modèle technique inspiré de `hanzi-ruby-lens` (sans la
 réactivité temps réel webhooks/Cloudflare).
 
-> **Site dépublié.** https://duan.life ne sert plus l'application, mais une page
-> blanche (voir [Déploiement](#déploiement)). Le code reste intact ici.
+Live : https://duan.life
 
 ## Langues
 
@@ -60,26 +59,32 @@ SYNC_PAT='github_pat_…' SYNC_PASSWORD='…' node scripts/build-secrets.mjs
 
 ## Déploiement
 
-**État actuel : dépublié.** Push sur `main` → GitHub Actions
-([`.github/workflows/blank.yml`](.github/workflows/blank.yml)) publie tel quel le
+Push sur `main` → GitHub Actions
+([`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)) :
+`npm ci` → `node scripts/build-secrets.mjs` → `npm run build` (base `/`,
+domaine personnalisé `duan.life` via [`public/CNAME`](public/CNAME)) →
+déploiement Pages.
+
+Secrets CI requis sur le dépôt `duan` : `SYNC_PAT`, `SYNC_PASSWORD`.
+Les coordonnées du dépôt de données sont publiques et vivent dans
+[`src/config.ts`](src/config.ts).
+
+### Dépublier
+
+Un pipeline de remplacement est prêt mais inerte, dans
+[`.github/workflows/blank.yml.disabled`](.github/workflows/blank.yml.disabled)
+(Actions n'exécute que les fichiers `.yml` / `.yaml`). Il publie tel quel le
 dossier [`offline/`](offline/) : une page vide en `noindex`, un `404.html`
 identique (pour que les anciennes URL type `/blog` restent blanches elles aussi),
 un `robots.txt` qui interdit tout, et un `CNAME`. Ni `npm`, ni build, ni
 `build-secrets.mjs` — le bundle chiffré `public/secrets.json` n'est donc plus
 publié.
 
-Le `CNAME` est conservé volontairement : il garde `duan.life` rattaché à ce dépôt.
-Sans lui, les enregistrements DNS pointeraient vers GitHub Pages sans propriétaire,
-et n'importe qui pourrait revendiquer le domaine.
+**Pour dépublier :** renommer `deploy.yml` en `deploy.yml.disabled` et
+`blank.yml.disabled` en `blank.yml`, puis push sur `main` (l'inverse pour
+republier). Ne pas cliquer « Unpublish » dans les réglages Pages : cela laisse la
+404 « Site not found » de GitHub sur le domaine.
 
-Le pipeline de l'application est intact mais inerte, dans
-[`.github/workflows/deploy.yml.disabled`](.github/workflows/deploy.yml.disabled)
-(Actions n'exécute que les fichiers `.yml` / `.yaml`) :
-`npm ci` → `node scripts/build-secrets.mjs` → `npm run build` (base `/`,
-domaine personnalisé via [`public/CNAME`](public/CNAME)) → déploiement Pages.
-
-**Pour republier l'application :** renommer `deploy.yml.disabled` en `deploy.yml`,
-supprimer `blank.yml` et `offline/`, vérifier que les secrets CI `SYNC_PAT` et
-`SYNC_PASSWORD` sont toujours valides sur le dépôt `duan`, puis push sur `main`.
-Les coordonnées du dépôt de données sont publiques et vivent dans
-[`src/config.ts`](src/config.ts).
+Le `CNAME` d'`offline/` est conservé volontairement : il garde `duan.life`
+rattaché à ce dépôt. Sans lui, les enregistrements DNS pointeraient vers GitHub
+Pages sans propriétaire, et n'importe qui pourrait revendiquer le domaine.

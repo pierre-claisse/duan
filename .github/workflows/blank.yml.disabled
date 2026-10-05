@@ -1,12 +1,14 @@
-# Serve a blank page at https://duan.life.
+# Serve a blank page at https://duan.life. INERT while this file ends in
+# `.disabled` (Actions only runs .yml/.yaml).
 #
-# The app is unpublished: this workflow deploys the hand-written static site in
-# `offline/` (an empty, noindex page + a matching 404 so deep links stay blank
-# too) instead of the Vite build. Keeping `offline/CNAME` re-binds duan.life to
-# this repository, so the DNS records cannot be claimed by anyone else.
+# Unpublishes the app: deploys the hand-written static site in `offline/` (an
+# empty, noindex page + a matching 404 so deep links stay blank too) instead of
+# the Vite build. Keeping `offline/CNAME` re-binds duan.life to this repository,
+# so the DNS records cannot be claimed by anyone else.
 #
-# To republish the app: rename `.github/workflows/deploy.yml.disabled` back to
-# `deploy.yml` and delete this file (and `offline/`).
+# To unpublish: rename this file to `blank.yml` and
+# `.github/workflows/deploy.yml` to `deploy.yml.disabled`, then push to main.
+# Swap them back to republish.
 name: Deploy (blank)
 
 on:
